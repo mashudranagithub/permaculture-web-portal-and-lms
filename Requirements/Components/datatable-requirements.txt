@@ -1,0 +1,65 @@
+================================================================================
+          PROJECT: PERMACULTURE ADMINISTRATIVE PORTAL
+          TECHNICAL STANDARD: THE PERFECT DATATABLE (LARAVEL + VUE 3 + INERTIA)
+================================================================================
+
+This document outlines the finalized standards for the Administrative Interface.
+All future modules MUST adhere to these patterns for UI/UX consistency.
+
+1. ARCHITECTURE OVERVIEW:
+-------------------------
+We use a "Zero-Dependency" Power Table approach with an mPDF backend for reporting.
+- Server-side Filtering, Search, and Sorting (Multi-column support).
+- Dynamic Pagination (5, 10, 20, 50, All).
+- Enterprise Export Suite (Copy, CSV, Excel, PDF, Print).
+
+2. DATATABLE UI & LAYOUT STANDARDS:
+-----------------------------------
+A. Control Row Layout:
+   - LEFT: Pagination Selector (`Show [X] entries`).
+   - RIGHT: Grouped Action Zone. Place the `Export Button Group` followed by the `Search Input Group`.
+   - Gap: Use `gap-2` or `gap-3` between the Export Group and Search.
+
+B. Export Buttons (Icon-Only Semantic Style):
+   - Background: Always use `btn-light` (Neutral) for button backgrounds to keep the header clean.
+   - Icon Colors: Use semantic coloring strictly for the icons:
+     * Excel: `text-success` (Green)
+     * PDF: `text-danger` (Red)
+     * CSV: `text-info` (Blue)
+     * Copy/Print: `text-secondary/dark`
+   - Sizing: Use `btn-sm` and `text-nowrap`. Icons must be left-aligned (`me-2`) with text.
+
+C. Search Input:
+   - Height: Normalize height to match `btn-sm` buttons (approx. 31px).
+   - Width: Use `min-width: 180px` or `200px` to ensure it doesn't push controls off-screen.
+
+3. ADMINISTRATIVE ACTION STANDARDS:
+-----------------------------------
+A. Primary Buttons (The Success Pattern):
+   - All "Create", "Save", and "Add" actions MUST use `btn-success btn-sm`.
+   - Design: Sharp corners (`rounded-1`) and a discrete shadow (`shadow-sm`).
+   - Theme: Aligned with the Permaculture Success-Green theme.
+
+B. Modal Form Design:
+   - Header: High-contrast `bg-success text-white` with `btn-close-white`.
+   - Footer: `bg-light` background with `btn-success btn-sm` primary actions.
+   - Clean Inputs: Use `border-success-subtle` or neutral borders; avoid heavy backgrounds.
+
+C. Slug Presentation:
+   - Presentation: Never use colored backgrounds for technical slugs.
+   - Styling: Use `code` tags with `text-secondary`, `font-size: 0.75rem`, and a clean mono-font.
+
+4. REPORTING & PDF ENGINE (MPDF):
+----------------------------------
+A. Backend Logic:
+   - Use `mpdf/mpdf` for all direct PDF downloads.
+   - Controller: Centralize generation in `App\Http\Controllers\Admin\ReportController`.
+   - Pattern: Force direct file downloads via `window.location.href`.
+
+B. PDF Templates:
+   - Standard: `resources/views/admin/reports/pdf.blade.php`.
+   - Features: Professional Header (Organization Logo/Name), Zebra-Striped Data Grid, Automated Timestamps.
+
+================================================================================
+                AUTHORIZED BY: USER & ANTIGRAVITY (AI)
+================================================================================

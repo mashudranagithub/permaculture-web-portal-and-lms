@@ -1,0 +1,750 @@
+================================================================================
+
+    PERMACULTURE EDUCATIONAL PORTAL
+    MODULE 3 — COURSE MANAGEMENT SYSTEM
+
+    Prepared for: Client Review & Approval
+    Version: 1.0
+    Date: April 18, 2026
+    Status: PENDING CLIENT APPROVAL
+
+================================================================================
+
+
+DOCUMENT PURPOSE
+----------------
+This document describes the complete feature set and functionality of the
+Course Management System module. Please review each section carefully and
+provide your feedback, suggestions, or changes. Development will begin
+only after your written approval.
+
+
+================================================================================
+TABLE OF CONTENTS
+================================================================================
+
+ 1. System Overview
+ 2. User Roles & Access Levels
+ 3. Course Management
+ 4. Batch Management
+ 5. Topic & Curriculum Structure
+ 6. Live Online Class Management
+ 7. Content Management
+ 8. Student Enrollment & Registration Flow
+ 9. Payment & Billing System
+ 10. Student Dashboard & Learning Experience
+ 11. Progress Tracking & Reports
+ 12. Notification System
+ 13. Bilingual Support (Bangla & English)
+ 14. Certificate Management
+ 15. Quality & Security Standards
+
+
+================================================================================
+1. SYSTEM OVERVIEW
+================================================================================
+
+The Course Management System is designed to allow the Permaculture
+Educational Portal to create, manage, and deliver educational courses
+with a structured, topic-based learning approach to students.
+
+The system supports:
+ - Full course lifecycle management (creation to archival).
+ - Bilingual content delivery in Bangla and English.
+ - Batch-based student enrollment with seat capacity control.
+ - Online and offline payment processing.
+ - Live online classes with recorded video fallback.
+ - Student progress tracking at the topic level.
+ - Certificate generation upon course completion.
+
+This system is designed to meet international educational management
+standards (ISO 21001:2018).
+
+
+================================================================================
+2. USER ROLES & ACCESS LEVELS
+================================================================================
+
+The system has the following user roles relevant to this module:
+
+SUPER ADMIN
+ - Full access to every feature in the system.
+ - Can manage all courses, batches, topics, enrollments, and payments.
+ - Can create and assign Course Admins.
+
+COURSE ADMIN
+ - Can create, edit, publish, and archive courses.
+ - Can create and manage batches (set capacity, dates, pricing).
+ - Can create and manage topics, upload content, and set class schedules.
+ - Can assign paid students to batches after verifying payment.
+ - Can upload class recordings and share video links.
+ - Can view enrollment, payment, and progress reports.
+
+INSTRUCTOR (Planned for Future Phase)
+ - Will be assigned to specific batches.
+ - Will be able to create/edit topic content for assigned courses.
+ - Will be able to conduct and manage live classes.
+ - Will be able to view student progress for their batches only.
+
+STUDENT (Registered User)
+ - Can browse all available courses.
+ - Can purchase and enroll in paid courses.
+ - Can access topic-based learning content for enrolled courses.
+ - Can join live online classes.
+ - Can watch recorded class videos.
+ - Can track personal learning progress.
+ - Can download certificates upon course completion.
+
+GUEST (Unregistered Visitor)
+ - Can browse the public course catalog.
+ - Can view course overview, pricing, and batch information.
+ - Must register and log in before enrolling or making payment.
+
+
+================================================================================
+3. COURSE MANAGEMENT
+================================================================================
+
+3.1. COURSE INFORMATION
+
+Each course will contain the following information:
+
+ - Course Title (in both Bangla and English)
+ - Course Description / Overview (in both Bangla and English)
+ - Short Description / Summary (in both Bangla and English)
+ - Course Thumbnail Image (main image shown in the catalog)
+ - Banner Image (for the course detail page header)
+ - Base Price (in BDT) — set to 0 for free courses
+ - Course Level: Foundation | Intermediate | Advanced
+ - Delivery Mode: Online | Offline | Hybrid
+ - Duration (e.g., "6 Months", "12 Weeks")
+ - Total Number of Topics (automatically counted)
+ - Total Number of Online Classes (automatically counted)
+ - Featured Course flag (highlighted on the homepage if enabled)
+
+3.2. COURSE STATUS LIFECYCLE
+
+Every course follows a defined lifecycle:
+
+ DRAFT → PUBLISHED → ARCHIVED
+
+ - DRAFT: The course is being built. Not visible to students.
+ - PUBLISHED: The course is live on the website. Students can view and
+   enroll in it.
+ - ARCHIVED: The course is retired. No new enrollments accepted, but
+   existing enrolled students retain access to their content.
+
+3.3. WHAT THE COURSE ADMIN CAN DO
+
+ - Create a new course with bilingual content (Bangla + English).
+ - Edit all course details (title, description, price, images, etc.).
+ - Change the course status (Draft → Published → Archived).
+ - Delete a course (data is preserved for records, not permanently lost).
+ - Duplicate/clone a course to use as a template for a new version.
+ - View all batches, topics, enrollments, and revenue for the course.
+
+3.4. PUBLIC COURSE CATALOG (What Visitors See)
+
+ - A catalog page listing all published courses.
+ - Each course card shows: thumbnail image, title, price, level, duration.
+ - Visitors can filter courses by: Level, Delivery Mode, Price (Free/Paid).
+ - Visitors can search by course title (in Bangla or English).
+ - Visitors can sort by: Newest, Price (Low to High, High to Low).
+ - Clicking a course opens a detailed page with the full overview, topic
+   list, available batches, pricing, and an "Enroll Now" button.
+
+
+================================================================================
+4. BATCH MANAGEMENT
+================================================================================
+
+Each course can have multiple batches. A batch represents a specific
+group of students who start and complete the course together.
+
+4.1. BATCH INFORMATION
+
+ - Batch Title / Name (e.g., "Batch 01 — Spring 2026")
+ - Associated Course
+ - Start Date
+ - End Date
+ - Enrollment Deadline (optional — enrollment closes on this date)
+ - Total Seat Capacity (0 means unlimited seats)
+ - Currently Enrolled Count (automatically tracked)
+ - Available Seats Remaining (automatically calculated)
+ - Batch Price (in BDT — can be different from the course base price)
+ - Discount (optional — fixed amount or percentage)
+ - Enrollment Open/Closed toggle
+
+4.2. BATCH STATUS LIFECYCLE
+
+ UPCOMING → ONGOING → COMPLETED
+
+ - UPCOMING: The batch has been created. Enrollment is open. Classes
+   have not started yet.
+ - ONGOING: Classes are in progress. Enrollment may still be open if
+   there are remaining seats.
+ - COMPLETED: All classes and topics are done. No new enrollments.
+ - CANCELLED: The batch was cancelled. Enrolled students are eligible
+   for a refund.
+
+4.3. WHAT THE COURSE ADMIN CAN DO
+
+ - Create a new batch under any course.
+ - Set the seat capacity and enrollment deadline.
+ - Set batch-specific pricing (can override the course's base price).
+ - Manually assign paid students to the batch (see Enrollment Flow).
+ - View the list of enrolled students with their payment status.
+ - Change the batch status (Upcoming → Ongoing → Completed).
+ - Open or close enrollment manually.
+ - Export the student list to CSV, Excel, or PDF.
+
+4.4. SEAT ALLOCATION RULES
+
+ - When a student completes payment, their status becomes
+   "Paid — Awaiting Batch Assignment".
+ - The Course Admin reviews the payment and manually assigns the
+   student to the appropriate batch.
+ - The system automatically checks seat availability. If the batch is
+   full, the Admin cannot assign more students and must either open a
+   new batch or increase the capacity.
+ - Each student can only be assigned to ONE batch per course.
+
+
+================================================================================
+5. TOPIC & CURRICULUM STRUCTURE
+================================================================================
+
+Each course is organized into topics. Topics form the curriculum and
+are the primary units of learning that students work through.
+
+5.1. TOPIC INFORMATION
+
+ - Topic Title (in both Bangla and English)
+ - Associated Course
+ - Topic Description / Summary (in both Bangla and English)
+ - Display Order (determines the sequence in which topics appear)
+ - Topic Type (see below for explanation)
+ - Content Body (in both Bangla and English — for Content type topics)
+ - Attached Files / Downloadable Resources
+ - Estimated Duration (e.g., "45 minutes", "2 hours")
+ - Published / Unpublished toggle
+ - Free Preview toggle (allows non-enrolled visitors to preview this topic)
+
+5.2. TOPIC TYPES
+
+Each topic has a type that determines how it behaves:
+
+ TYPE: CONTENT
+   Standard learning material containing text, images, tables, videos,
+   and audio. Students read and study at their own pace.
+
+ TYPE: PDF (Document Reader)
+   The topic's primary learning material is a PDF file. Students read
+   the PDF directly in the browser using an embedded PDF reader —
+   no download is required, although a download option is also
+   available. The admin can upload separate Bangla and English PDF files.
+   Use cases: Course handouts, reference guides, textbook chapters,
+   research papers, or supplementary reading material.
+
+ TYPE: ONLINE CLASS (Live Session)
+   This topic is linked to a scheduled live online class (see Section 6).
+   Before the class: students see the date/time and a "Join" button.
+   After the class: students see the recorded video instead.
+
+ TYPE: ASSIGNMENT (Planned for Future Phase)
+   A task that students must submit. Can include file uploads and
+   text responses.
+
+ TYPE: QUIZ (Planned for Future Phase)
+   An auto-graded assessment with multiple choice, true/false, or
+   short answer questions.
+
+5.3. HOW STUDENTS SEE THE CURRICULUM
+
+ - On their dashboard, students see a "My Courses" section.
+ - Each enrolled course shows a topic list, ordered by display order.
+ - Example: If a course has 10 topics, the student sees a list of all
+   10 topics on their course page.
+ - Each topic in the list shows:
+   * Topic title (in the student's preferred language)
+   * Type icon (Content / PDF / Online Class / Assignment / Quiz)
+   * Estimated duration
+   * Completion status: Not Started | In Progress | Completed
+   * A lock icon if the topic is not yet published or requires
+     completing a previous topic first.
+ - Clicking a topic opens its full content page.
+
+5.4. TOPIC ORDERING
+
+ - Topics are displayed in the order set by the Admin.
+ - Admin can reorder topics using a drag-and-drop interface.
+ - Optional: Admin can enforce sequential access — students must
+   complete Topic 1 before they can access Topic 2, and so on.
+
+
+================================================================================
+6. LIVE ONLINE CLASS MANAGEMENT
+================================================================================
+
+Some topics in a course are live online classes. This section describes
+how online classes are scheduled, conducted, and recorded.
+
+6.1. CLASS SCHEDULE / ROUTINE
+
+ - Each batch can have a fixed weekly class routine.
+ - The routine specifies:
+   * Day of the week (e.g., Saturday, Monday)
+   * Start time and end time (e.g., 8:00 PM — 10:00 PM)
+   * Timezone (default: Bangladesh Standard Time, UTC+6)
+   * Platform: Zoom | Google Meet | Microsoft Teams | Other
+   * Whether the class repeats every week
+ - The Course Admin sets the routine when creating or editing a batch.
+
+6.2. INDIVIDUAL CLASS SESSIONS
+
+Each live class session contains:
+ - Class title (e.g., "Topic 3 — Soil Regeneration Live Class")
+ - Associated batch and topic
+ - Scheduled date and time
+ - Duration in minutes
+ - Meeting link (Zoom / Google Meet / Teams URL)
+ - Meeting password (if applicable)
+ - Status: Scheduled | Live | Completed | Cancelled
+ - YouTube video URL (added after the class is recorded and uploaded)
+ - Instructor name
+ - Class notes or agenda (in both Bangla and English)
+
+6.3. CLASS WORKFLOW
+
+ BEFORE THE CLASS:
+   - Course Admin creates class sessions and links them to specific
+     topics within a batch.
+   - Students see upcoming classes on their dashboard with a countdown
+     timer showing how much time is left until the class starts.
+   - The system sends a reminder notification (by email) before the
+     class (e.g., 1 hour before).
+
+ DURING THE CLASS:
+   - Students click the "Join Class" button to open the meeting link
+     in a new window.
+
+ AFTER THE CLASS:
+   - Course Admin marks the class as "Completed."
+   - Course Admin uploads the class recording to the organization's
+     YouTube channel (as an unlisted video for privacy).
+   - Course Admin adds the YouTube video URL to the class session.
+   - The video link becomes visible to students on the topic page.
+   - Students who missed the live class can watch the recording at
+     any time.
+
+6.4. RECORDED CLASS VIDEO ACCESS
+
+ - All class recordings are hosted on YouTube as unlisted videos
+   (only people with the link can watch — not publicly searchable).
+ - Only enrolled students of the specific batch can see the video link.
+ - The video link appears under the corresponding topic in the
+   course curriculum.
+ - Students can watch the recording any time after it is uploaded.
+
+
+================================================================================
+7. CONTENT MANAGEMENT
+================================================================================
+
+7.1. RICH CONTENT EDITOR
+
+The system includes a rich text editor for creating topic content.
+It supports the following content types:
+
+ - Formatted text (headings, paragraphs, bold, italic, lists, quotes)
+ - Tables (with styling)
+ - Images (upload from computer or link from URL)
+ - Embedded videos (YouTube, Vimeo)
+ - Embedded audio
+ - File attachments (PDF, Word, PowerPoint — downloadable by students)
+ - Links (internal and external)
+
+The editor supports separate Bangla and English content entry using
+tabs or side-by-side fields.
+
+7.2. FILE STORAGE
+
+ - Images and attachments are stored on the server.
+ - Videos are hosted on YouTube and embedded in the content.
+ - PDF files for PDF-type topics are stored on the server and
+   displayed via an in-browser PDF reader.
+ - Maximum file upload sizes are configurable by the administrator.
+
+
+================================================================================
+8. STUDENT ENROLLMENT & REGISTRATION FLOW
+================================================================================
+
+This section describes the complete journey of a student from
+discovering a course to gaining access to its content.
+
+8.1. ENROLLMENT SCENARIOS
+
+SCENARIO A — Logged-In Student Enrolling in a PAID Course:
+
+ 1. Student browses the course catalog on the website.
+ 2. Student clicks "Enroll Now" on a course detail page.
+ 3. System displays the available batches with pricing, dates, and
+    remaining seats.
+ 4. Student selects a batch.
+ 5. System redirects the student to the Payment Page.
+ 6. Student completes payment using one of the available gateways
+    (bKash, Nagad, SSLCommerz, bank transfer, etc.).
+ 7. Payment is recorded as "Completed."
+ 8. Enrollment is created with status "Paid — Awaiting Batch
+    Assignment."
+ 9. Course Admin receives a notification about the new payment.
+ 10. Course Admin reviews the payment and assigns the student to
+     the appropriate batch.
+ 11. Student receives a confirmation notification.
+ 12. Student can now access course content and live classes.
+
+SCENARIO B — Logged-In Student Enrolling in a FREE Course:
+
+ 1. Student clicks "Enroll Now" on a free course.
+ 2. System shows available batches.
+ 3. Student selects a batch.
+ 4. System automatically enrolls the student (no payment needed).
+ 5. Student can immediately access course content.
+
+SCENARIO C — Guest (Not Registered) Attempting to Enroll:
+
+ 1. Guest browses the course catalog.
+ 2. Guest clicks "Enroll Now" on any course.
+ 3. System redirects the guest to the Registration Page.
+    (The selected course is remembered.)
+ 4. Guest registers with name, email, phone, and password.
+ 5. Email verification is sent (if enabled).
+ 6. After registration, the system automatically redirects the student
+    back to the enrollment flow for the selected course.
+ 7. The entire experience is seamless: Register → Pay → Enroll.
+
+8.2. ENROLLMENT STATUS TRACKING
+
+Each enrollment has a status that tracks where the student is in
+the process:
+
+ - Pending Payment — Student started enrollment but payment is not
+   yet completed.
+ - Paid, Awaiting Assignment — Payment confirmed, waiting for the
+   Course Admin to assign the student to a batch.
+ - Active — Student is assigned to a batch and can access content.
+ - Completed — Student has completed all topics in the course.
+ - Dropped — Student has dropped out of the course.
+ - Suspended — Student's access has been temporarily blocked by Admin.
+ - Refunded — Payment was refunded and access has been revoked.
+
+8.3. ENROLLMENT RULES
+
+ - A student can enroll in a specific course only ONCE.
+ - Each student is assigned to only one batch per course.
+ - The system automatically checks seat availability before enrollment.
+ - The Course Admin can manually change a student's enrollment status
+   (e.g., suspend access, mark as dropped).
+
+
+================================================================================
+9. PAYMENT & BILLING SYSTEM
+================================================================================
+
+9.1. PAYMENT INFORMATION
+
+Each payment record contains:
+ - Student name and account
+ - Associated batch
+ - Payment amount (in BDT)
+ - Discount applied (if any)
+ - Net amount paid
+ - Payment gateway used (bKash, Nagad, Rocket, SSLCommerz,
+   Bank Transfer, Cash, or Manual)
+ - Transaction ID (from the payment gateway)
+ - Payment status: Pending | Completed | Failed | Refunded
+ - Invoice number (auto-generated, e.g., INV-2026-00001)
+ - Verified by (which Admin verified the payment)
+ - Verification notes
+
+9.2. ONLINE PAYMENT FLOW
+
+ 1. Student selects a batch. The system calculates the final price
+    (batch price minus any applicable discount).
+ 2. System creates a payment record with status "Pending."
+ 3. Student is redirected to the selected payment gateway (e.g., bKash).
+ 4. After successful payment, the gateway sends a confirmation.
+ 5. System verifies the transaction and updates the status to "Completed."
+ 6. The enrollment is automatically updated.
+ 7. Course Admin receives a notification.
+
+MANUAL PAYMENT (Bank Transfer / Cash):
+
+ 1. Student selects "Bank Transfer" or "Cash" as the payment method.
+ 2. System displays bank account details or payment instructions.
+ 3. Student makes the payment offline.
+ 4. Student submits the transaction reference or uploads a receipt.
+ 5. Course Admin manually verifies the payment and marks it as
+    "Completed."
+
+9.3. REFUND POLICY
+
+ - Course Admin can initiate full or partial refunds.
+ - A refund updates the payment status and revokes the student's
+   enrollment access.
+ - All refund actions are logged for audit purposes.
+
+9.4. REVENUE REPORTS
+
+ - The Admin can view total revenue by course, batch, or time period.
+ - Payment status breakdown: Completed, Pending, Failed, Refunded.
+ - Reports can be exported to CSV, Excel, or PDF.
+
+
+================================================================================
+10. STUDENT DASHBOARD & LEARNING EXPERIENCE
+================================================================================
+
+10.1. STUDENT DASHBOARD — "MY COURSES"
+
+After logging in, students see a personalized dashboard:
+
+ - A list of all their enrolled courses (In Progress and Completed).
+ - Each course card shows:
+   * Course thumbnail image
+   * Course title (in the student's preferred language)
+   * Batch name and dates
+   * Overall progress bar (percentage of topics completed)
+   * Date of last access
+   * A "Continue Learning" button that jumps to the next
+     incomplete topic.
+
+10.2. COURSE LEARNING PAGE
+
+When a student opens a course, they see:
+
+ - LEFT SIDEBAR: A numbered topic list (in order).
+   * Each topic shows its title, type icon, and completion status.
+   * The currently active topic is highlighted.
+   * Locked or unpublished topics appear grayed out with a lock icon.
+
+ - MAIN CONTENT AREA: The full content of the selected topic.
+   * For CONTENT type: Rich text, images, tables, videos, audio.
+   * For PDF type: An embedded in-browser PDF reader displaying
+     the uploaded document file.
+   * For ONLINE CLASS type:
+     - If the class is upcoming: date/time and "Join Class" button.
+     - If the class is completed: embedded YouTube video player.
+   * A "Mark as Complete" button at the bottom.
+   * "Previous Topic" and "Next Topic" navigation buttons.
+
+10.3. UPCOMING CLASSES WIDGET
+
+ - Shows the next scheduled live classes with a countdown timer.
+ - A quick "Join" button for immediate access.
+ - Displayed both on the dashboard and within the course learning page.
+
+10.4. MOBILE EXPERIENCE
+
+ - All pages are fully responsive and work on phones and tablets.
+ - The topic sidebar collapses into a dropdown menu on small screens.
+ - Video and PDF viewers scale automatically to the device screen.
+ - All buttons and navigation are touch-friendly.
+
+
+================================================================================
+11. PROGRESS TRACKING & REPORTS
+================================================================================
+
+11.1. STUDENT PROGRESS TRACKING
+
+The system tracks progress at the topic level for each student:
+
+ - Each topic has a status: Not Started | In Progress | Completed.
+ - When a student opens a topic, it is marked as "In Progress."
+ - When a student clicks "Mark as Complete," it is marked "Completed."
+ - The system records time spent on each topic.
+
+11.2. COURSE-LEVEL PROGRESS
+
+ - The overall course progress is automatically calculated:
+   (Completed Topics ÷ Total Topics) × 100 = Progress Percentage
+ - This percentage is displayed on the student's dashboard as a
+   progress bar.
+
+11.3. ADMIN REPORTS
+
+The Course Admin has access to detailed analytics:
+
+ - Total enrollments (by course, batch, or time period).
+ - Course completion rates (percentage of students who finish).
+ - Average progress per batch.
+ - Revenue statistics and financial summaries.
+ - Most popular courses (ranked by enrollment count).
+ - Student engagement metrics (last login, time spent learning).
+ - Dropout rate analysis.
+ - All reports can be exported to CSV, Excel, or PDF.
+
+11.4. STUDENT SELF-VIEW
+
+Students can view their own learning analytics:
+
+ - Personal progress across all enrolled courses.
+ - Completion percentage per course.
+ - Number of topics completed vs. remaining.
+ - Live class attendance record.
+ - Total time spent on learning.
+
+
+================================================================================
+12. NOTIFICATION SYSTEM
+================================================================================
+
+12.1. NOTIFICATIONS FOR STUDENTS
+
+Students will receive notifications for the following events:
+
+ - Enrollment has been confirmed.
+ - Payment has been received and verified.
+ - Batch assignment is completed — access is now active.
+ - A new topic has been published in their enrolled course.
+ - Live class reminder (1 hour and 15 minutes before the class).
+ - Class recording has been uploaded — video link is now available.
+ - Course completion congratulations.
+ - Certificate is ready for download.
+
+12.2. NOTIFICATIONS FOR COURSE ADMIN
+
+ - A new payment has been received (requires verification).
+ - A new enrollment is awaiting batch assignment.
+ - A batch is approaching full capacity (e.g., 80% seats filled).
+ - A student has dropped or requested a refund.
+
+12.3. NOTIFICATION CHANNELS
+
+ - In-App: Bell icon notification inside the portal (real-time).
+ - Email: Automated email notifications for important events.
+ - SMS: Planned for a future phase (via local SMS gateway).
+
+12.4. NOTIFICATION PREFERENCES
+
+ - Students can choose to turn off email notifications by category.
+ - Admin notifications are always active and cannot be disabled.
+
+
+================================================================================
+13. BILINGUAL SUPPORT (Bangla & English)
+================================================================================
+
+13.1. CONTENT IN TWO LANGUAGES
+
+All student-facing content is stored and displayed in two languages:
+Bangla (বাংলা) and English.
+
+This applies to:
+ - Course titles, descriptions, and short descriptions
+ - Topic titles, descriptions, and content
+ - PDF files (separate uploads for Bangla and English versions)
+ - Class session notes and agendas
+ - Notification messages
+
+13.2. LANGUAGE SWITCHING
+
+ - The website has a language toggle button (EN ↔ BN).
+ - Each student's preferred language is saved in their profile.
+ - All content automatically displays in the student's chosen language.
+ - If content in the preferred language is unavailable, the system
+   automatically falls back to the other language.
+
+13.3. ADMIN CONTENT ENTRY
+
+ - When creating or editing a course, topic, or class session, the
+   Admin sees tabbed or side-by-side input fields for both languages.
+ - Bangla is mandatory for all content. English is strongly recommended
+   but not mandatory.
+ - The text editor fully supports Bangla Unicode input.
+
+
+================================================================================
+14. CERTIFICATE MANAGEMENT (Planned for Future Phase)
+================================================================================
+
+14.1. CERTIFICATE GENERATION
+
+ - When a student completes 100% of a course's topics, a certificate
+   is automatically generated.
+ - The certificate includes: Course name, Student name, Completion
+   date, Serial number, and Organization branding.
+ - The certificate is generated as a downloadable PDF.
+ - A QR code on the certificate links to a public verification page.
+
+14.2. CERTIFICATE VERIFICATION
+
+ - A public page is available at:
+   /verify-certificate/{serial_number}
+ - Anyone can scan the QR code or visit the URL to verify the
+   authenticity of a certificate.
+ - The page displays: Student name, Course title, Completion date,
+   and Issuing authority.
+
+
+================================================================================
+15. QUALITY & SECURITY STANDARDS
+================================================================================
+
+15.1. PERFORMANCE
+
+ - All pages load within 2-3 seconds.
+ - The system handles large course catalogs and student lists
+   efficiently with pagination and caching.
+
+15.2. SECURITY
+
+ - All admin pages are protected by role-based access control.
+ - Students can only access content for courses they are enrolled in.
+ - Payment gateway communications are secured and verified.
+ - All forms are protected against cross-site request forgery (CSRF).
+ - All user inputs are sanitized to prevent malicious content.
+ - Sensitive data (like meeting passwords) is encrypted.
+
+15.3. ACCESSIBILITY
+
+ - The interface follows web accessibility standards (WCAG 2.1 AA).
+ - Proper labels and descriptions for all interactive elements.
+ - Keyboard navigation support throughout the platform.
+ - Sufficient color contrast for readability.
+ - Descriptive text for all images.
+
+15.4. SEARCH ENGINE OPTIMIZATION (Public Pages)
+
+ - Each course has a unique, descriptive page title and description
+   (in both Bangla and English).
+ - Social media sharing tags (Open Graph) for course pages.
+ - Clean, readable URLs (e.g., /courses/permaculture-design-foundation).
+ - Course pages are included in the site's search engine sitemap.
+
+15.5. MOBILE COMPATIBILITY
+
+ - The entire system is fully responsive and works seamlessly on
+   desktop computers, tablets, and mobile phones.
+ - All interactive elements are touch-friendly.
+ - Video players and PDF readers adapt to screen size automatically.
+
+
+================================================================================
+
+    PLEASE REVIEW THIS DOCUMENT CAREFULLY.
+
+    After your review, please respond with:
+     ✅  Approved — Ready for development.
+     ✏️  Changes Required — Please specify what to add, remove, or modify.
+
+    Your feedback is essential before we begin development.
+
+================================================================================
+
+    Prepared by: Permaculture Development Team
+    Contact: [Your Email / Phone]
+
+================================================================================
