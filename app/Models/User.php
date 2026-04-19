@@ -25,7 +25,18 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'password',
         'is_approved',
+        'avatar',
     ];
+
+    /**
+     * Get the user's avatar URL.
+     */
+    public function getAvatarUrl(): string
+    {
+        return $this->avatar 
+            ? asset('storage/' . $this->avatar) 
+            : 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&background=198754&color=fff';
+    }
 
     /**
      * The attributes that should be hidden for serialization.

@@ -36,6 +36,7 @@ class HandleInertiaRequests extends Middleware
                     'id' => $request->user()->id,
                     'name' => $request->user()->name,
                     'email' => $request->user()->email,
+                    'avatar_url' => $request->user()->getAvatarUrl(),
                     'roles' => $request->user()->roles->pluck('slug')->toArray(),
                     'permissions' => collect($request->user()->permissions->pluck('slug'))
                         ->merge($request->user()->roles->flatMap->permissions->pluck('slug'))
@@ -44,7 +45,15 @@ class HandleInertiaRequests extends Middleware
                         ->toArray(),
                 ] : null,
             ],
-            'translations' => json_decode(file_get_contents(lang_path(app()->getLocale() . '.json')), true) ?? [],
+            'translations' => function () {
+                $locale = app()->getLocale();
+                $file = lang_path("$locale.json");
+                if (is_file($file)) {
+                    $translations = json_decode(file_get_contents($file), true);
+                    return empty($translations) ? (object) [] : $translations;
+                }
+                return (object) [];
+            },
         ];
     }
 }

@@ -107,7 +107,7 @@ const exportData = (type) => {
     } else if (type === 'copy') {
         const text = data.map(obj => Object.values(obj).join('\t')).join('\n');
         navigator.clipboard.writeText(text);
-        alert('Data copied!');
+        alert(__('Data copied!'));
     }
 };
 
@@ -154,7 +154,7 @@ const closeModal = () => {
 };
 
 const deletePermission = (permission) => {
-    if (confirm(`Are you sure you want to delete the "${permission.name}" permission? This will remove it from all roles and users.`)) {
+    if (confirm(__('Are you sure you want to delete the :name permission? This will remove it from all roles and users.', { name: permission.name }))) {
         router.delete(route('admin.permissions.destroy', permission.id));
     }
 };
@@ -217,7 +217,7 @@ const deletePermission = (permission) => {
                             <table class="table table-bordered table-striped table-hover align-middle mb-0 dataTable custom-small-table">
                                 <thead class="table-light">
                                     <tr>
-                                        <th class="ps-3 text-center py-2" style="width: 50px;">SL.</th>
+                                        <th class="ps-3 text-center py-2" style="width: 50px;">{{ __('SL.') }}</th>
                                         <th @click="toggleSort('name')" class="sorting py-2 cursor-pointer" :class="{ 'sorting_asc': sortField === 'name' && sortDirection === 'asc', 'sorting_desc': sortField === 'name' && sortDirection === 'desc' }">
                                             {{ __('Permission Name') }}
                                         </th>
@@ -232,13 +232,13 @@ const deletePermission = (permission) => {
                                             {{ (permissions.current_page - 1) * permissions.per_page + index + 1 }}
                                         </td>
                                         <td class="">
-                                            <div class="fw-bold text-dark">{{ permission.name }}</div>
+                                            <div class="fw-bold text-dark">{{ __(permission.name) }}</div>
                                         </td>
                                         <td>
                                             <code class="text-secondary" style="font-size: 0.75rem;">{{ permission.slug }}</code>
                                         </td>
                                         <td>
-                                            <span class="text-muted" style="font-size: 0.75rem;">{{ permission.description || __('No description provided') }}</span>
+                                            <span class="text-muted" style="font-size: 0.75rem;">{{ permission.description ? __(permission.description) : __('No description provided') }}</span>
                                         </td>
                                         <td class="text-center">
                                             <div class="d-flex justify-content-center gap-1">

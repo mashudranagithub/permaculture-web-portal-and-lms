@@ -61,12 +61,12 @@ onMounted(() => {
 
                     <li class="nav-item dropdown user-menu">
                         <a href="#" class="nav-link dropdown-toggle d-flex align-items-center gap-2" data-bs-toggle="dropdown">
-                            <img src="https://ui-avatars.com/api/?name=User&background=198754&color=fff" class="user-image rounded-circle shadow" style="width: 30px;" alt="User Image">
+                            <img :src="$page.props.auth.user.avatar_url" class="user-image rounded-circle shadow border border-success-subtle object-fit-cover" style="width: 32px; height: 32px;" alt="User Image">
                             <span class="d-none d-md-inline fw-semibold text-dark">{{ $page.props.auth.user.name }}</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end shadow border-0 rounded-3">
                             <li class="user-header bg-success text-white p-3 text-center">
-                                <img src="https://ui-avatars.com/api/?name=User&background=fff&color=198754" class="rounded-circle shadow mb-2" style="width: 60px;" alt="User Image">
+                                <img :src="$page.props.auth.user.avatar_url" class="rounded-circle shadow mb-2 border border-2 border-white object-fit-cover" style="width: 70px; height: 70px;" alt="User Image">
                                 <p class="fw-bold mb-0">{{ $page.props.auth.user.name }}</p>
                                 <small v-if="$page.props.auth.user.roles && $page.props.auth.user.roles.length">{{ $page.props.auth.user.roles[0] }}</small>
                             </li>

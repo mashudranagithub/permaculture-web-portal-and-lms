@@ -113,7 +113,7 @@ const exportData = async (type) => {
     } else if (type === 'copy') {
         const text = data.map(obj => Object.values(obj).join('\t')).join('\n');
         navigator.clipboard.writeText(text);
-        alert('Data copied to clipboard!');
+        alert(__('Data copied to clipboard!'));
     }
 };
 
@@ -169,7 +169,7 @@ const updateRoles = () => {
 };
 
 const approveUser = (user) => {
-    if (confirm('Are you sure you want to approve this user?')) {
+    if (confirm(__('Are you sure you want to approve this user?'))) {
         router.patch(route('admin.users.approve', user.id));
     }
 };
@@ -240,7 +240,7 @@ const generatePassword = () => {
                             <table class="table table-bordered table-striped table-hover align-middle mb-0 dataTable custom-small-table">
                                 <thead class="table-light">
                                     <tr>
-                                        <th class="ps-3 text-center py-2" style="width: 50px;">SL.</th>
+                                        <th class="ps-3 text-center py-2" style="width: 50px;">{{ __('SL.') }}</th>
                                         <th @click="toggleSort('name')" class="sorting py-2 cursor-pointer" :class="{ 'sorting_asc': sortField === 'name' && sortDirection === 'asc', 'sorting_desc': sortField === 'name' && sortDirection === 'desc' }">
                                             {{ __('User Name') }}
                                         </th>
@@ -277,7 +277,7 @@ const generatePassword = () => {
                                         <td>
                                             <div class="d-flex flex-wrap gap-1">
                                                 <span v-for="role in user.roles" :key="role" class="badge bg-success text-white px-2">
-                                                    {{ role }}
+                                                    {{ __(role) }}
                                                 </span>
                                             </div>
                                         </td>

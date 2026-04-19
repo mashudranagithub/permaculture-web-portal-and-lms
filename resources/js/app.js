@@ -1,7 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './bootstrap';
 
-import { createInertiaApp, router } from '@inertiajs/vue3';
+import { createInertiaApp, router, usePage } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createApp, h } from 'vue';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
@@ -36,7 +36,7 @@ createInertiaApp({
             .use(ZiggyVue);
 
         vueApp.config.globalProperties.__ = (key) => {
-            const translations = props.initialPage.props.translations || {};
+            const translations = usePage().props.translations || {};
             return translations[key] || key;
         };
 

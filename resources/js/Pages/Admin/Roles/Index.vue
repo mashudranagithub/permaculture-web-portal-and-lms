@@ -108,7 +108,7 @@ const exportData = (type) => {
     } else if (type === 'copy') {
         const text = data.map(obj => Object.values(obj).join('\t')).join('\n');
         navigator.clipboard.writeText(text);
-        alert('Data copied!');
+        alert(__('Data copied!'));
     }
 };
 
@@ -155,7 +155,7 @@ const closeModal = () => {
 };
 
 const deleteRole = (role) => {
-    if (confirm(`Are you sure you want to delete the ${role.name} role?`)) {
+    if (confirm(__('Are you sure you want to delete the :name role?', { name: role.name }))) {
         router.delete(route('admin.roles.destroy', role.id));
     }
 };
@@ -218,7 +218,7 @@ const deleteRole = (role) => {
                             <table class="table table-bordered table-striped table-hover align-middle mb-0 dataTable custom-small-table">
                                 <thead class="table-light">
                                     <tr>
-                                        <th class="ps-3 text-center py-2" style="width: 50px;">SL.</th>
+                                        <th class="ps-3 text-center py-2" style="width: 50px;">{{ __('SL.') }}</th>
                                         <th @click="toggleSort('name')" class="sorting py-2 cursor-pointer" :class="{ 'sorting_asc': sortField === 'name' && sortDirection === 'asc', 'sorting_desc': sortField === 'name' && sortDirection === 'desc' }">
                                             {{ __('Role Name') }}
                                         </th>
@@ -233,7 +233,7 @@ const deleteRole = (role) => {
                                             {{ (roles.current_page - 1) * roles.per_page + index + 1 }}
                                         </td>
                                         <td>
-                                            <div class="fw-bold text-dark">{{ role.name }}</div>
+                                            <div class="fw-bold text-dark">{{ __(role.name) }}</div>
                                         </td>
                                         <td>
                                             <code class="text-secondary" style="font-size: 0.75rem;">{{ role.slug }}</code>
@@ -244,7 +244,7 @@ const deleteRole = (role) => {
                                                     {{ __('All Permissions') }}
                                                 </span>
                                                 <span v-else v-for="perm in role.permissions" :key="perm" class="badge bg-light text-dark border px-2 shadow-xs" style="font-size: 0.7rem;">
-                                                    {{ perm }}
+                                                    {{ __(perm) }}
                                                 </span>
                                             </div>
                                         </td>
