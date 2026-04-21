@@ -22,6 +22,7 @@ Route::middleware(['auth', 'verified', 'approved'])->group(function () {
     })->name('dashboard');
 
     Route::resource('courses', CourseController::class);
+    Route::resource('batches', \App\Http\Controllers\BatchController::class);
 
     // Admin Routes
     Route::middleware(['role:super-admin,admin'])->prefix('admin')->name('admin.')->group(function () {

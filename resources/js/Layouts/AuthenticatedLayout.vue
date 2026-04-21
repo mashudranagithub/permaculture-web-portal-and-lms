@@ -1,5 +1,5 @@
 <script setup>
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
 import { onMounted, ref, computed, watch } from 'vue';
 
 const isSidebarCollapsed = ref(false);
@@ -30,6 +30,18 @@ const toggleAclMenu = () => {
 onMounted(() => {
     // Basic initialization
 });
+
+const flash = computed(() => usePage().props.flash || {});
+const showFlash = ref(false);
+
+watch(() => usePage().props.flash, (newFlash) => {
+    if (newFlash && newFlash.message) {
+        showFlash.value = true;
+        setTimeout(() => {
+            showFlash.value = false;
+        }, 5000);
+    }
+}, { deep: true, immediate: true });
 </script>
 
 <template>
@@ -106,6 +118,12 @@ onMounted(() => {
                                 <p>{{ __('Courses') }}</p>
                             </Link>
                         </li>
+                        <li class="nav-item">
+                            <Link :href="route('batches.index')" class="nav-link" :class="{ 'active': route().current('batches.*') }">
+                                <i class="nav-icon bi bi-collection-fill"></i>
+                                <p>{{ __('Batches') }}</p>
+                            </Link>
+                        </li>
 
                         <!-- ACL Section -->
                         <li v-if="can('manage-users') || can('manage-roles') || can('manage-permissions')" class="nav-header text-uppercase small text-white-50 mt-3">{{ __('System Management') }}</li>
@@ -144,7 +162,21 @@ onMounted(() => {
         </aside>
 
         <!-- Main Content -->
-        <main class="app-main bg-light min-vh-100">
+        <main class="app-main bg-light min-vh-100 position-relative">
+            <!-- Global Flash Message Toast -->
+            <div v-if="showFlash && $page.props.flash.message" 
+                 class="position-fixed top-0 start-50 translate-middle-x mt-3 z-3 animate__animated animate__fadeInDown">
+                <div class="alert alert-success border-0 shadow-lg d-flex align-items-center rounded-1 py-2 px-4 mb-0" 
+                     role="alert" style="border-left: 5px solid #0f5132 !important;">
+                    <i class="bi bi-check-circle-fill me-3 fs-5"></i>
+                    <div>
+                        <div class="fw-bold small">{{ __('Success!') }}</div>
+                        <div class="small opacity-75">{{ $page.props.flash.message }}</div>
+                    </div>
+                    <button type="button" class="btn-close ms-4 small shadow-none" @click="showFlash = false"></button>
+                </div>
+            </div>
+
             <div class="app-content-header border-bottom bg-white py-3 mb-4" v-if="$slots.header">
                 <div class="container-fluid">
                     <div class="row align-items-center">
@@ -199,12 +231,6 @@ onMounted(() => {
     color: #198754 !important;
 }
 
-/* Single Menu Item Active (e.g. Dashboard) - Solid Background */
-.sidebar-menu > .nav-item > .nav-link.active:not(:has(+ .nav-treeview)),
-.sidebar-menu > .nav-item:not(.menu-open) > .nav-link.active {
-    /* If it's a direct link or the menu is closed, we can keep background or use another style */
-    /* Let's follow the user's wish and keep parents clean. */
-}
 
 /* Leaf Node (Final Link) Active State - SOLID GREEN BAGROUND */
 /* This shows exactly where the user is */

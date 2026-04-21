@@ -29,15 +29,18 @@ This document provides a high-level overview of the development progress, comple
     - [x] Built custom **Media Upload Pipeline** (Backend MediaController + Frontend Adapter).
     - [x] Activated "Everything is Rich Text" policy (Descriptions, Short Excerpts, and SEO notes).
 - [x] **Courses Index**: Refactored from Card-Grid to Standard DataTable with PDF reporting.
+- [x] **Batch Management**:
+    - [x] Implemented full CRUD with standardized DataTable.
+    - [x] Added auto-pricing logic and categorical date management.
+    - [x] Integrated course-batch filtering.
 
 ---
 
 ## 🟡 CURRENTLY DEVELOPING (Module 3: CMS Phase 2)
 
-### 📦 Batch & Enrollment Preparation
-- [x] **Storage Foundation**: Fixed `storage:link` and reactive editor shields for media reliability.
-- [ ] **Infrastructure Update**: Batch Management properties (Start/End dates, seat allocation).
-- [ ] **Batch Logic**: Scheduled routines and enrollment deadlines.
+### 📦 Enrollment & Payment Integration
+- [ ] **Enrollment Logic**: Seat allocation and status tracking.
+- [ ] **Payment Redirect**: Preparing for bKash/SSLCommerz.
 
 ---
 
@@ -48,8 +51,7 @@ This document provides a high-level overview of the development progress, comple
 - [ ] **Blog/Article System**: Knowledge sharing platform for Permaculture.
 - [ ] **Membership Tiers**: Tiered membership levels (Basic, Pro, Life) with purchase flow.
 
-### 📦 CMS Phase 2: Batch & Enrollment
-- [ ] Implement Batch Management (Start/End dates, seat allocation).
+- [ ] Build Enrollment Pipeline (Price calculation, payment redirection).
 - [ ] Build Enrollment Pipeline (Price calculation, payment redirection).
 - [ ] **Module 7: Payment System**: Integration with bKash and SSLCommerz.
 
@@ -74,7 +76,7 @@ This document provides a high-level overview of the development progress, comple
 | :--- | :--- | :--- |
 | **Foundational UI/UX** | 100% | ✅ Done |
 | **ACL (Users/Roles)** | 100% | ✅ Done |
-| **Module 3: Course Management** | 50% | 🚧 In Progress |
+| **Module 3: Course Management** | 70% | 🚧 In Progress |
 | **Module 1: Web Portal** | 10% | 📋 Planned |
 | **Module 2: Membership** | 5% | 📋 Planned |
 | **Module 4 & 5: Assessment** | 0% | 📋 Planned |
@@ -82,4 +84,4 @@ This document provides a high-level overview of the development progress, comple
 | **Module 7: Payments** | 0% | 📋 Planned |
 | **Module 8: Books Store** | 0% | 📋 Planned |
 
-*Last Updated: 18 April, 2026 (End of Day Session)*
+*Last Updated: 21 April, 2026 (Batch Management Module Completed)*
