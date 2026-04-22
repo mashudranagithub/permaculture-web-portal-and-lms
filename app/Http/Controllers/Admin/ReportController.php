@@ -106,15 +106,39 @@ class ReportController extends Controller
             'rows' => $courses->map(function ($course, $index) {
                 return [
                     $index + 1,
-                    $course->title, // Model likely handles bilinguality
+                    $course->translate('title'),
                     number_format((float) $course->price, 2),
                     $course->level,
-                    $course->is_online ? 'Online' : 'In-Person',
-                    $course->is_active ? 'Active' : 'Inactive'
+                    $course->delivery_mode,
+                    $course->status
                 ];
             })
         ])->render();
 
         return $this->generatePdf($html, 'courses_report_' . date('Y-m-d'));
+    }
+
+    public function downloadBatches(Request $request)
+    {
+        $batches = \App\Models\Batch::with('course')->get();
+        $title = "Course Batches Report";
+
+        $html = view('admin.reports.pdf', [
+            'title' => $title,
+            'headers' => ['SL', 'Course', 'Batch Title', 'Start Date', 'End Date', 'Seats', 'Status'],
+            'rows' => $batches->map(function ($batch, $index) {
+                return [
+                    $index + 1,
+                    $batch->course ? $batch->course->translate('title') : 'N/A',
+                    $batch->translate('title'),
+                    $batch->start_date ? $batch->start_date->format('d M, Y') : 'N/A',
+                    $batch->end_date ? $batch->end_date->format('d M, Y') : 'N/A',
+                    ($batch->enrollments()->count()) . ' / ' . ($batch->capacity ?: '∞'),
+                    ucfirst($batch->status)
+                ];
+            })
+        ])->render();
+
+        return $this->generatePdf($html, 'batches_report_' . date('Y-m-d'));
     }
 }

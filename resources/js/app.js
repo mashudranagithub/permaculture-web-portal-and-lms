@@ -8,6 +8,8 @@ import { ZiggyVue } from '../../vendor/tightenco/ziggy';
 import * as bootstrap from 'bootstrap';
 window.bootstrap = bootstrap;
 
+import DateInput from './Components/DateInput.vue';
+
 // Global Tooltip Management for Inertia transitions
 router.on('before', () => {
     const tooltips = document.querySelectorAll('.tooltip');
@@ -33,7 +35,8 @@ createInertiaApp({
     setup({ el, App, props, plugin }) {
         const vueApp = createApp({ render: () => h(App, props) })
             .use(plugin)
-            .use(ZiggyVue);
+            .use(ZiggyVue)
+            .component('DateInput', DateInput);
 
         vueApp.config.globalProperties.__ = (key) => {
             const translations = usePage().props.translations || {};

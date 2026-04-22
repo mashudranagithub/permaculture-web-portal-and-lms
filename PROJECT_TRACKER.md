@@ -31,8 +31,9 @@ This document provides a high-level overview of the development progress, comple
 - [x] **Courses Index**: Refactored from Card-Grid to Standard DataTable with PDF reporting.
 - [x] **Batch Management**:
     - [x] Implemented full CRUD with standardized DataTable.
-    - [x] Added auto-pricing logic and categorical date management.
-    - [x] Integrated course-batch filtering.
+    - [x] **Bilingual Support**: Fully localized Batch titles and descriptions.
+    - [x] **Class Routine Builder**: Added dynamic weekly schedule manager (Day/Time/Platform).
+    - [x] Integrated course-batch filtering and auto-pricing logic.
 
 ---
 
@@ -76,7 +77,7 @@ This document provides a high-level overview of the development progress, comple
 | :--- | :--- | :--- |
 | **Foundational UI/UX** | 100% | ✅ Done |
 | **ACL (Users/Roles)** | 100% | ✅ Done |
-| **Module 3: Course Management** | 70% | 🚧 In Progress |
+| **Module 3: Course Management** | 80% | 🚧 In Progress |
 | **Module 1: Web Portal** | 10% | 📋 Planned |
 | **Module 2: Membership** | 5% | 📋 Planned |
 | **Module 4 & 5: Assessment** | 0% | 📋 Planned |
@@ -84,4 +85,4 @@ This document provides a high-level overview of the development progress, comple
 | **Module 7: Payments** | 0% | 📋 Planned |
 | **Module 8: Books Store** | 0% | 📋 Planned |
 
-*Last Updated: 21 April, 2026 (Batch Management Module Completed)*
+*Last Updated: 22 April, 2026 (Batch Schedules & Bilingual Support Finalized)*

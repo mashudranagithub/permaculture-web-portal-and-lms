@@ -1,0 +1,59 @@
+================================================================================
+          PROJECT: PERMACULTURE ADMINISTRATIVE PORTAL
+          TECHNICAL STANDARD: THE UNIVERSAL DATE & TIME PICKER
+================================================================================
+
+This document outlines the standard for date and time selection across the
+entire application. All forms requiring temporal input MUST follow this standard.
+
+1. CORE TECHNOLOGY:
+-------------------
+We have selected "@vuepic/vue-datepicker" as the enterprise standard.
+- Library: @vuepic/vue-datepicker
+- Why: Native Vue 3 support, accessible (A11Y), highly customizable, supports
+       date, time, month, year, and range pickers in a single package.
+
+2. VISUAL & UI STANDARDS (THE "GREEN" THEME):
+---------------------------------------------
+To maintain consistency with the Permaculture Admin theme:
+- Primary Color: #198754 (Success Green).
+- Selection Color: #198754 with white text.
+- Hover State: #f8f9fa (Light Grey) with #198754 text accent.
+- Corners: 1px border radius (rounded-1) to match Bootstrap buttons.
+- Input Group styling: Must integrate with Bootstrap .input-group when needed.
+- Action Buttons: "Select" button must be .btn-success style.
+
+3. GLOBAL COMPONENT WRAPPER:
+----------------------------
+All implementations should use a centralized wrapper component:
+`resources/js/Components/DateInput.vue`
+
+Default Props for standardized behavior:
+- format: "dd MMM, yyyy" (for Date only)
+- format: "dd MMM, yyyy - hh:mm a" (for DateTime)
+- time-picker-inline: true (where applicable)
+- auto-apply: true (for simple date pickers)
+- close-on-scroll: true
+
+4. BILINGUAL SUPPORT (EN/BN):
+----------------------------
+The datepicker must respond to the application's locale.
+- Locale Mapping:
+  * English: locale="en"
+  * Bangla: locale="bn" (Ensure day/month names are correctly localized).
+- Manual Input: Always allowed and validated.
+
+5. PLACEMENT & USABILITY:
+-------------------------
+- Z-Index: Must be high enough to clear Modals (default approx 9999).
+- Responsive: Switch to "teleport" mode to avoid clipping in small containers
+              or nested overflow-hidden divs.
+- State: Use .is-invalid class on the picker wrapper if form validation fails.
+
+6. INSTALLATION COMMAND:
+------------------------
+npm install @vuepic/vue-datepicker
+
+================================================================================
+                AUTHORIZED BY: USER & ANTIGRAVITY (AI)
+================================================================================

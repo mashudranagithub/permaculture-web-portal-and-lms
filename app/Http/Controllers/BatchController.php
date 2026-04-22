@@ -25,7 +25,10 @@ class BatchController extends Controller
         $batches = Batch::query()
             ->with(['course'])
             ->when($request->search, function ($query, $search) {
-                $query->where('title', 'like', "%{$search}%")
+                $query->where('title->en', 'like', "%{$search}%")
+                      ->orWhere('title->bn', 'like', "%{$search}%")
+                      ->orWhere('description->en', 'like', "%{$search}%")
+                      ->orWhere('description->bn', 'like', "%{$search}%")
                       ->orWhereHas('course', function ($q) use ($search) {
                           $q->where('title->en', 'like', "%{$search}%")
                             ->orWhere('title->bn', 'like', "%{$search}%");
@@ -37,10 +40,10 @@ class BatchController extends Controller
             ->orderBy($sortField, $sortDirection)
             ->paginate($perPage)
             ->withQueryString()
-            ->through(fn (\App\Models\Batch $batch) => [
+            ->through(fn (Batch $batch) => [
                 'id' => $batch->id,
                 'course_title' => $batch->course ? $batch->course->translate('title') : 'N/A',
-                'title' => $batch->title,
+                'title' => $batch->translate('title'),
                 'start_date' => $batch->start_date ? $batch->start_date->format('d M, Y') : 'N/A',
                 'end_date' => $batch->end_date ? $batch->end_date->format('d M, Y') : 'N/A',
                 'capacity' => $batch->capacity,
@@ -85,7 +88,10 @@ class BatchController extends Controller
     {
         $validated = $request->validate([
             'course_id' => 'required|exists:courses,id',
-            'title' => 'required|string|max:255',
+            'title.en' => 'required|string|max:255',
+            'title.bn' => 'required|string|max:255',
+            'description.en' => 'nullable|string',
+            'description.bn' => 'nullable|string',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
             'enrollment_deadline' => 'nullable|date|before_or_equal:start_date',
@@ -95,9 +101,20 @@ class BatchController extends Controller
             'discount_type' => 'nullable|in:fixed,percentage',
             'status' => 'required|in:upcoming,ongoing,completed,cancelled',
             'is_enrollment_open' => 'required|boolean',
+            'schedules' => 'nullable|array',
+            'schedules.*.day_of_week' => 'required|in:sat,sun,mon,tue,wed,thu,fri',
+            'schedules.*.start_time' => 'required',
+            'schedules.*.end_time' => 'required',
+            'schedules.*.platform' => 'required|string',
         ]);
 
-        Batch::create($validated);
+        $batch = Batch::create($validated);
+
+        if ($request->has('schedules')) {
+            foreach ($request->schedules as $schedule) {
+                $batch->schedules()->create($schedule);
+            }
+        }
 
         return redirect()->route('batches.index')
             ->with('message', 'Batch created successfully!');
@@ -108,6 +125,8 @@ class BatchController extends Controller
      */
     public function edit(Batch $batch): Response
     {
+        $batch->load('schedules');
+        
         $courses = Course::get(['id', 'title', 'price'])->map(fn(Course $c) => [
             'id' => $c->id,
             'title' => $c->translate('title'),
@@ -127,7 +146,10 @@ class BatchController extends Controller
     {
         $validated = $request->validate([
             'course_id' => 'required|exists:courses,id',
-            'title' => 'required|string|max:255',
+            'title.en' => 'required|string|max:255',
+            'title.bn' => 'required|string|max:255',
+            'description.en' => 'nullable|string',
+            'description.bn' => 'nullable|string',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
             'enrollment_deadline' => 'nullable|date|before_or_equal:start_date',
@@ -137,9 +159,22 @@ class BatchController extends Controller
             'discount_type' => 'nullable|in:fixed,percentage',
             'status' => 'required|in:upcoming,ongoing,completed,cancelled',
             'is_enrollment_open' => 'required|boolean',
+            'schedules' => 'nullable|array',
+            'schedules.*.day_of_week' => 'required|in:sat,sun,mon,tue,wed,thu,fri',
+            'schedules.*.start_time' => 'required',
+            'schedules.*.end_time' => 'required',
+            'schedules.*.platform' => 'required|string',
         ]);
 
         $batch->update($validated);
+
+        // Update Schedules
+        $batch->schedules()->delete();
+        if ($request->has('schedules')) {
+            foreach ($request->schedules as $schedule) {
+                $batch->schedules()->create($schedule);
+            }
+        }
 
         return redirect()->route('batches.index')
             ->with('message', 'Batch updated successfully!');

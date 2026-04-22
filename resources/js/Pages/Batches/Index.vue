@@ -48,6 +48,77 @@ const toggleSort = (field) => {
     updateTable();
 };
 
+const exportData = async (type) => {
+    const data = props.batches.data.map((batch, index) => ({
+        SL: (props.batches.current_page - 1) * props.batches.per_page + index + 1,
+        Course: batch.course_title,
+        Title: batch.title,
+        'Start Date': batch.start_date,
+        'End Date': batch.end_date,
+        Price: batch.price,
+        Status: batch.status
+    }));
+
+    if (type === 'pdf') {
+        window.location.href = route('admin.reports.batches.pdf');
+        return;
+    }
+
+    if (type === 'csv' || type === 'excel') {
+        const headers = Object.keys(data[0]).join(',');
+        const rows = data.map(obj => Object.values(obj).map(v => `"${v}"`).join(',')).join('\n');
+        const blob = new Blob([headers + '\n' + rows], { type: 'text/csv;charset=utf-8;' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `batches_report_${new Date().toISOString().slice(0, 10)}.${type === 'csv' ? 'csv' : 'xlsx'}`;
+        a.click();
+    } else if (type === 'print') {
+        const printWindow = window.open('', '_blank');
+        const tableHtml = `
+            <html>
+            <head>
+                <title>Batch Report - PRINT</title>
+                <style>
+                    body { font-family: sans-serif; padding: 30px; color: #333; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                    th, td { border: 1px solid #000; padding: 10px; text-align: left; font-size: 11px; }
+                    th { background-color: #f0f0f0; font-weight: bold; text-transform: uppercase; }
+                    h2 { color: #198754; margin-top: 0; border-bottom: 2px solid #198754; padding-bottom: 10px; }
+                    .footer { margin-top: 20px; font-size: 10px; color: #666; text-align: right; }
+                </style>
+            </head>
+            <body>
+                <h2>Course Batches Report</h2>
+                <p><strong>Generated on:</strong> ${new Date().toLocaleString()}</p>
+                <table>
+                    <thead>
+                        <tr>${Object.keys(data[0]).map(h => `<th>${h}</th>`).join('')}</tr>
+                    </thead>
+                    <tbody>
+                        ${data.map(row => `<tr>${Object.values(row).map(v => `<td>${v}</td>`).join('')}</tr>`).join('')}
+                    </tbody>
+                </table>
+                <div class="footer">Generated via Permaculture ERP Management System</div>
+                <script>
+                    window.onload = function() {
+                        setTimeout(function() {
+                            window.print();
+                        }, 500);
+                    }
+                <\/script>
+            </body>
+            </html>
+        `;
+        printWindow.document.write(tableHtml);
+        printWindow.document.close();
+    } else if (type === 'copy') {
+        const text = data.map(obj => Object.values(obj).join('\t')).join('\n');
+        navigator.clipboard.writeText(text);
+        alert('Data copied to clipboard!');
+    }
+};
+
 const deleteBatch = (batch) => {
     if (confirm('Are you sure you want to delete this batch?')) {
         router.delete(route('batches.destroy', batch.id));
@@ -87,6 +158,7 @@ const getStatusBadge = (status) => {
                         </div>
                         
                         <div class="mt-4 row g-3 align-items-center">
+                            <!-- Left Section: Pagination -->
                             <div class="col-md-auto d-flex align-items-center gap-2">
                                 <span class="small fw-bold text-muted">{{ __('Show') }}</span>
                                 <select v-model="perPage" class="form-select form-select-sm border-secondary-subtle shadow-none w-auto rounded-1">
@@ -94,23 +166,46 @@ const getStatusBadge = (status) => {
                                     <option value="10">10</option>
                                     <option value="20">20</option>
                                     <option value="50">50</option>
+                                    <option value="all">{{ __('All') }}</option>
                                 </select>
                                 <span class="small fw-bold text-muted">{{ __('entries') }}</span>
                             </div>
 
-                            <div class="col-md-3">
-                                <select v-model="courseId" class="form-select form-select-sm border-secondary-subtle shadow-none rounded-1">
-                                    <option value="">{{ __('All Courses') }}</option>
-                                    <option v-for="course in courses" :key="course.id" :value="course.id">
-                                        {{ course.title }}
-                                    </option>
-                                </select>
-                            </div>
+                            <!-- Right Section: Filters + Exports + Search -->
+                            <div class="col-md-auto ms-auto d-flex align-items-center">
+                                <!-- Course Filter -->
+                                <div class="me-2" style="min-width: 140px;">
+                                    <select v-model="courseId" class="form-select form-select-sm border-secondary-subtle shadow-none rounded-1">
+                                        <option value="">{{ __('All Courses') }}</option>
+                                        <option v-for="course in courses" :key="course.id" :value="course.id">
+                                            {{ course.title }}
+                                        </option>
+                                    </select>
+                                </div>
 
-                            <div class="col-md-auto ms-md-auto d-flex align-items-center gap-2">
-                                <div class="input-group input-group-sm rounded-1 overflow-hidden border shadow-sm">
+                                <!-- Export Buttons Pack -->
+                                <div class="btn-group btn-group-sm shadow-sm rounded-1 overflow-visible border me-2">
+                                    <button @click="exportData('copy')" class="btn btn-light border-0 px-2 text-nowrap d-flex align-items-center" :title="__('Copy')">
+                                        <i class="bi bi-clipboard me-2 small text-secondary"></i>{{ __('Copy') }}
+                                    </button>
+                                    <button @click="exportData('csv')" class="btn btn-light border-0 px-2 border-start text-nowrap d-flex align-items-center" :title="__('CSV')">
+                                        <i class="bi bi-file-earmark-spreadsheet me-2 small text-info"></i>CSV
+                                    </button>
+                                    <button @click="exportData('excel')" class="btn btn-light border-0 px-2 border-start text-nowrap d-flex align-items-center" :title="__('Excel')">
+                                        <i class="bi bi-file-earmark-excel me-2 small text-success"></i>Excel
+                                    </button>
+                                    <button @click="exportData('pdf')" class="btn btn-light border-0 px-2 border-start text-nowrap d-flex align-items-center" :title="__('PDF')">
+                                        <i class="bi bi-file-earmark-pdf-fill me-2 small text-danger"></i>PDF
+                                    </button>
+                                    <button @click="exportData('print')" class="btn btn-light border-0 px-2 border-start text-nowrap d-flex align-items-center" :title="__('Print')">
+                                        <i class="bi bi-printer me-2 small text-dark"></i>{{ __('Print') }}
+                                    </button>
+                                </div>
+
+                                <!-- Search -->
+                                <div class="input-group input-group-sm rounded-1 overflow-hidden border shadow-sm" style="width: 12vw; min-width: 140px;">
                                     <span class="input-group-text bg-white border-0 text-muted px-2"><i class="bi bi-search"></i></span>
-                                    <input v-model="search" type="text" class="form-control border-0 ps-0 shadow-none" :placeholder="__('Search batches...')" style="min-width: 200px; height: 31px;">
+                                    <input v-model="search" type="text" class="form-control border-0 ps-0 shadow-none" :placeholder="__('Search...')" style="height: 31px;">
                                 </div>
                             </div>
                         </div>
@@ -121,12 +216,17 @@ const getStatusBadge = (status) => {
                             <table class="table table-bordered table-striped table-hover align-middle mb-0 dataTable">
                                 <thead class="table-light">
                                     <tr>
-                                        <th class="ps-3 text-center py-2" style="width: 50px;">SL.</th>
-                                        <th class="py-2">{{ __('Course') }}</th>
+                                        <th class="ps-3 text-center py-2" style="width: 50px;">{{ __('SL.') }}</th>
                                         <th @click="toggleSort('title')" class="sorting py-2 cursor-pointer" :class="{ 'sorting_asc': sortField === 'title' && sortDirection === 'asc', 'sorting_desc': sortField === 'title' && sortDirection === 'desc' }">
                                             {{ __('Batch Title') }}
                                         </th>
-                                        <th class="py-2">{{ __('Timeline') }}</th>
+                                        <th class="py-2">{{ __('Course') }}</th>
+                                        <th @click="toggleSort('start_date')" class="sorting py-2 cursor-pointer" :class="{ 'sorting_asc': sortField === 'start_date' && sortDirection === 'asc', 'sorting_desc': sortField === 'start_date' && sortDirection === 'desc' }">
+                                            {{ __('Start Date') }}
+                                        </th>
+                                        <th @click="toggleSort('end_date')" class="sorting py-2 cursor-pointer" :class="{ 'sorting_asc': sortField === 'end_date' && sortDirection === 'asc', 'sorting_desc': sortField === 'end_date' && sortDirection === 'desc' }">
+                                            {{ __('End Date') }}
+                                        </th>
                                         <th class="py-2 text-center">{{ __('Seats') }}</th>
                                         <th class="py-2 text-center">{{ __('Status') }}</th>
                                         <th class="text-center py-2" style="width: 120px;">{{ __('Actions') }}</th>
@@ -138,21 +238,17 @@ const getStatusBadge = (status) => {
                                             {{ (batches.current_page - 1) * batches.per_page + index + 1 }}
                                         </td>
                                         <td>
-                                            <span class="badge bg-light text-dark border fw-normal">{{ batch.course_title }}</span>
-                                        </td>
-                                        <td>
                                             <div class="fw-bold text-dark">{{ batch.title }}</div>
                                             <div class="small text-success fw-bold">৳ {{ Number(batch.price).toLocaleString() }}</div>
                                         </td>
-                                        <td class="small">
-                                            <div class="d-flex align-items-center gap-1 mb-1">
-                                                <i class="bi bi-calendar-event text-muted"></i>
-                                                <span>{{ batch.start_date }}</span>
-                                            </div>
-                                            <div class="d-flex align-items-center gap-1 text-muted">
-                                                <i class="bi bi-calendar-check-fill text-muted"></i>
-                                                <span>{{ batch.end_date }}</span>
-                                            </div>
+                                        <td>
+                                            <span class="badge bg-light text-dark border fw-normal">{{ batch.course_title }}</span>
+                                        </td>
+                                        <td class="text-muted fw-semibold small">
+                                            <i class="bi bi-calendar-event me-1"></i>{{ batch.start_date }}
+                                        </td>
+                                        <td class="text-muted fw-semibold small">
+                                            <i class="bi bi-calendar-check-fill me-1"></i>{{ batch.end_date }}
                                         </td>
                                         <td class="text-center">
                                             <div class="fw-bold">{{ batch.enrolled_count }} / {{ batch.capacity || '∞' }}</div>
@@ -177,7 +273,7 @@ const getStatusBadge = (status) => {
                                         </td>
                                     </tr>
                                     <tr v-if="batches.data.length === 0">
-                                        <td colspan="7" class="text-center py-5 text-muted bg-light-subtle small font-italic">
+                                        <td colspan="8" class="text-center py-5 text-muted bg-light-subtle small font-italic">
                                             {{ __('No batches found.') }}
                                         </td>
                                     </tr>

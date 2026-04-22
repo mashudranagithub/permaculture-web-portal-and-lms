@@ -44,6 +44,7 @@ Route::middleware(['auth', 'verified', 'approved'])->group(function () {
             Route::get('/roles/pdf', [\App\Http\Controllers\Admin\ReportController::class, 'downloadRoles'])->name('roles.pdf')->middleware('permission:manage-roles');
             Route::get('/permissions/pdf', [\App\Http\Controllers\Admin\ReportController::class, 'downloadPermissions'])->name('permissions.pdf')->middleware('permission:manage-permissions');
             Route::get('/courses/pdf', [\App\Http\Controllers\Admin\ReportController::class, 'downloadCourses'])->name('courses.pdf');
+            Route::get('/batches/pdf', [\App\Http\Controllers\Admin\ReportController::class, 'downloadBatches'])->name('batches.pdf');
         });
     });
 

@@ -2,18 +2,25 @@
 
 namespace App\Models;
 
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property \Carbon\Carbon $start_date
+ * @property \Carbon\Carbon $end_date
+ * @property \Carbon\Carbon|null $enrollment_deadline
+ */
 class Batch extends Model
 {
-    use SoftDeletes;
+    use HasTranslations, SoftDeletes;
 
     protected $fillable = [
         'course_id',
         'title',
+        'description',
         'start_date',
         'end_date',
         'enrollment_deadline',
@@ -26,6 +33,8 @@ class Batch extends Model
     ];
 
     protected $casts = [
+        'title' => 'array',
+        'description' => 'array',
         'start_date' => 'date',
         'end_date' => 'date',
         'enrollment_deadline' => 'date',
