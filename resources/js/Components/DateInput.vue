@@ -1,10 +1,8 @@
 <script setup>
-import { computed } from 'vue';
+import { onMounted, onBeforeUnmount, ref, watch, computed } from 'vue';
 
 /**
- * STANDARD STABLE DATE INPUT
- * Replaces the unstable VueDatePicker with a bulletproof native implementation
- * to ensure the application's Inertia routing and event loop remain stable.
+ * PREMIUM DATE/TIME INPUT COMPONENT (Flatpickr + Boxicons)
  */
 const props = defineProps({
     modelValue: [String, Date, Object, Array],
@@ -14,45 +12,92 @@ const props = defineProps({
     required: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
     readonly: { type: Boolean, default: false },
+    minDate: { type: String, default: null },
+    maxDate: { type: String, default: null },
 });
 
 const emit = defineEmits(['update:modelValue']);
 
-// Map my types to native input types
-const inputType = computed(() => {
-    if (props.type === 'datetime') return 'datetime-local';
-    return props.type; // date, time, month, year
+const inputRef = ref(null);
+let fp = null;
+
+// Determine icon based on type
+const iconClass = computed(() => {
+    if (props.type === 'time') return 'bx bx-time-five';
+    if (props.type === 'datetime') return 'bx bx-calendar-event';
+    return 'bx bx-calendar';
 });
 
-const value = computed({
-    get: () => {
-        if (!props.modelValue) return '';
-        // Handle ISO strings (2026-04-21T00:00:00Z) by stripping the time for 'date' inputs
-        if (typeof props.modelValue === 'string' && props.type === 'date') {
-            return props.modelValue.split(' ')[0].split('T')[0];
-        }
-        return props.modelValue;
-    },
-    set: (val) => emit('update:modelValue', val),
+// Configure Flatpickr based on type
+const initFlatpickr = () => {
+    if (fp) fp.destroy();
+
+    const flatpickr = window.flatpickr;
+    if (!flatpickr) {
+        console.error('Flatpickr not found globally!');
+        return;
+    }
+
+    const config = {
+        dateFormat: props.type === 'time' ? 'H:i' : (props.type === 'datetime' ? 'Y-m-d H:i' : 'Y-m-d'),
+        altInput: true,
+        altFormat: props.type === 'time' ? 'h:i K' : (props.type === 'datetime' ? 'd/m/Y h:i K' : 'd/m/Y'),
+        allowInput: true,
+        disableMobile: true,
+        enableTime: props.type === 'datetime' || props.type === 'time',
+        noCalendar: props.type === 'time',
+        time_24hr: false,
+        minDate: props.minDate,
+        maxDate: props.maxDate,
+        onChange: (selectedDates, dateStr) => {
+            emit('update:modelValue', dateStr);
+        },
+    };
+
+    fp = flatpickr(inputRef.value, config);
+};
+
+onMounted(() => {
+    initFlatpickr();
+});
+
+onBeforeUnmount(() => {
+    if (fp) fp.destroy();
+});
+
+// Sync value changes from parent
+watch(() => props.modelValue, (newVal) => {
+    if (fp && newVal !== fp.input.value) {
+        fp.setDate(newVal, false);
+    }
+});
+
+// Sync min/max date changes
+watch(() => props.minDate, (newVal) => {
+    if (fp) fp.set('minDate', newVal);
+});
+
+watch(() => props.maxDate, (newVal) => {
+    if (fp) fp.set('maxDate', newVal);
 });
 </script>
 
 <template>
-    <div class="custom-date-container">
-        <div class="input-group has-validation shadow-sm rounded-1 overflow-hidden">
-            <span class="input-group-text bg-light border-end-0 text-success">
-                <i v-if="type === 'time'" class="bi bi-clock"></i>
-                <i v-else class="bi bi-calendar-date"></i>
+    <div class="premium-date-wrapper">
+        <div class="input-group custom-input-group" :class="{ 'is-invalid': error, 'disabled': disabled }">
+            <span class="input-group-text bg-white border-end-0">
+                <i :class="iconClass"></i>
             </span>
             <input 
-                :type="inputType" 
-                v-model="value"
-                class="form-control border-start-0 ps-1"
+                ref="inputRef"
+                type="text"
+                class="form-control border-start-0 ps-1 shadow-none"
                 :class="{ 'is-invalid': error }"
-                :required="required"
+                :value="modelValue"
+                :placeholder="placeholder || (type === 'time' ? '00:00' : 'DD/MM/YYYY')"
                 :disabled="disabled"
+                :required="required"
                 :readonly="readonly"
-                :placeholder="placeholder"
             >
         </div>
         <div v-if="error" class="text-danger small mt-1 animate__animated animate__fadeIn">
@@ -61,35 +106,87 @@ const value = computed({
     </div>
 </template>
 
-<style scoped>
-.custom-date-container {
-    width: 100%;
-}
-.form-control {
-    border-color: #dee2e6;
-    padding-top: 0.6rem;
-    padding-bottom: 0.6rem;
-    font-size: 0.9rem;
-}
-.input-group-text {
-    border-color: #dee2e6;
-    font-size: 1rem;
-    padding-right: 0.5rem;
-}
-.form-control:focus {
-    border-color: #198754;
-    box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.1);
-    z-index: 3;
-}
-.input-group:focus-within .input-group-text {
-    border-color: #198754;
-    color: #198754 !important;
+<style>
+/* Premium Flatpickr Styling */
+.flatpickr-calendar {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 8px !important;
+    font-family: 'Inter', system-ui, sans-serif !important;
 }
 
-/* Success Green Calendar Icon Styling */
-input[type="date"]::-webkit-calendar-picker-indicator,
-input[type="time"]::-webkit-calendar-picker-indicator {
-    cursor: pointer;
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%23198754" class="bi bi-calendar" viewBox="0 0 16 16"><path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/></svg>');
+.flatpickr-day.selected, 
+.flatpickr-day.startRange, 
+.flatpickr-day.endRange, 
+.flatpickr-day.selected.prevMonthDay, 
+.flatpickr-day.selected.nextMonthDay, 
+.flatpickr-day.startRange.prevMonthDay, 
+.flatpickr-day.startRange.nextMonthDay, 
+.flatpickr-day.endRange.prevMonthDay, 
+.flatpickr-day.endRange.nextMonthDay {
+    background: #198754 !important;
+    border-color: #198754 !important;
+}
+
+.flatpickr-months .flatpickr-month {
+    background: #198754 !important;
+    color: #fff !important;
+    fill: #fff !important;
+    border-radius: 8px 8px 0 0;
+}
+
+.flatpickr-current-month .flatpickr-monthDropdown-months {
+    font-weight: 700 !important;
+}
+
+.flatpickr-calendar.hasTime .flatpickr-time {
+    border-top: 1px solid #e2e8f0 !important;
+}
+
+/* Input Group Enhancements */
+.custom-input-group {
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.custom-input-group .input-group-text {
+    color: #198754;
+    font-size: 1.1rem;
+    padding-left: 0.75rem;
+    padding-right: 0.5rem;
+    border-color: #dee2e6;
+}
+
+.custom-input-group .form-control {
+    height: 42px;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    font-size: 0.95rem;
+    border-color: #dee2e6;
+    color: #334155;
+}
+
+.custom-input-group:focus-within {
+    border-color: #198754;
+    box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.1);
+}
+
+.custom-input-group:focus-within .input-group-text,
+.custom-input-group:focus-within .form-control {
+    border-color: #198754;
+}
+
+.custom-input-group.is-invalid {
+    border-color: #dc3545;
+}
+
+.custom-input-group.disabled {
+    background-color: #f8fafc;
+    opacity: 0.7;
+}
+
+.premium-date-wrapper .is-invalid {
+    border-color: #dc3545 !important;
 }
 </style>

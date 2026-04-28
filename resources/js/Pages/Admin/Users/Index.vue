@@ -208,13 +208,13 @@ const generatePassword = () => {
                         <div class="mt-4 row g-3 align-items-center">
                             <div class="col-md-auto d-flex align-items-center gap-2">
                                 <span class="small fw-bold text-muted">{{ __('Show') }}</span>
-                                <select v-model="perPage" class="form-select form-select-sm border-secondary-subtle shadow-none w-auto rounded-1">
+                                <Select2 v-model="perPage" class="w-auto">
                                     <option value="5">5</option>
                                     <option value="10">10</option>
                                     <option value="20">20</option>
                                     <option value="50">50</option>
                                     <option value="all">{{ __('All') }}</option>
-                                </select>
+                                </Select2>
                                 <span class="small fw-bold text-muted">{{ __('entries') }}</span>
                             </div>
                             <div class="col-md-auto ms-md-auto d-flex align-items-center gap-2">

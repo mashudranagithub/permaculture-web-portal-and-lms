@@ -1,0 +1,58 @@
+================================================================================
+          PROJECT: PERMACULTURE ADMINISTRATIVE PORTAL
+          TECHNICAL STANDARD: THE PREMIUM SELECT2 DROPDOWN
+================================================================================
+
+This document outlines the standard for dropdown selection across the entire 
+application. All forms requiring single or multiple selection MUST follow this standard.
+
+1. CORE TECHNOLOGY:
+-------------------
+We have selected "Select2" with the "Bootstrap 5 Theme" as the enterprise standard.
+- Library: select2 (initialized via jQuery)
+- Theme: select2-bootstrap-5-theme
+- Wrapper: resources/js/Components/Select2.vue
+
+2. VISUAL & UI STANDARDS:
+-------------------------
+To maintain consistency with the high-end Permaculture Admin theme:
+- Standard Height: MUST be exactly 42px to align with other form inputs.
+- Active Border: #198754 (Success Green) with 0.25rem focus shadow (10% opacity).
+- Typography: 0.95rem font size for rendered text and placeholders.
+- Placeholder Color: #6c757d (Muted Gray).
+
+3. THE "X" CLEAR BUTTON (CRITICAL):
+-----------------------------------
+Every searchable dropdown MUST support clear functionality (allowClear: true).
+The clear button must follow the refined "Outliner" design:
+- Style: Pure CSS drawn cross (No external font dependency for the X).
+- Design: 1px solid #dc3545 (Danger Red) circular border, transparent background.
+- Dimensions: 12px diameter circle.
+- Centering: Mathematically centered cross using 1.5px thick rotated lines.
+- Visibility: ALWAYS visible if an option is selected.
+- Positioning: Absolute positioned inside the selection box (right: 2.5rem).
+
+4. BILINGUAL & SEARCH SUPPORT:
+------------------------------
+- Search: Standard Select2 fuzzy search enabled by default.
+- Labels: All options must support bilingual rendering (Bangla/English).
+- Empty States: Must show localized "No results found" messages.
+
+5. INTEGRATION & REACTIVITY:
+----------------------------
+- The Select2 component must be reactive to Vue 3 v-model changes.
+- It must handle Hot Module Replacement (HMR) by destroying and re-initializing 
+  instances to prevent memory leaks or ghost elements.
+- Z-Index: Standard dropdown z-index (999+) to clear all modal and table layers.
+
+6. USAGE EXAMPLE:
+-----------------
+<Select2 v-model="form.category_id" :placeholder="__('Select Category')" allowClear>
+    <option v-for="item in items" :key="item.id" :value="item.id">
+        {{ item.name }}
+    </option>
+</Select2>
+
+================================================================================
+                AUTHORIZED BY: USER & ANTIGRAVITY (AI)
+================================================================================

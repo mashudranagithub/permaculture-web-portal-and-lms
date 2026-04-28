@@ -1,6 +1,6 @@
 ================================================================================
           PROJECT: PERMACULTURE ADMINISTRATIVE PORTAL
-          TECHNICAL STANDARD: THE UNIVERSAL DATE & TIME PICKER
+          TECHNICAL STANDARD: THE BILINGUAL FLATPICKR DATEPICKER
 ================================================================================
 
 This document outlines the standard for date and time selection across the
@@ -8,51 +8,48 @@ entire application. All forms requiring temporal input MUST follow this standard
 
 1. CORE TECHNOLOGY:
 -------------------
-We have selected "@vuepic/vue-datepicker" as the enterprise standard.
-- Library: @vuepic/vue-datepicker
-- Why: Native Vue 3 support, accessible (A11Y), highly customizable, supports
-       date, time, month, year, and range pickers in a single package.
+We have migrated to "Flatpickr" as the enterprise standard for temporal selection.
+- Library: flatpickr
+- Wrapper: resources/js/Components/DateInput.vue
+- Why: Lightweight, zero dependencies (native JS), excellent bilingual support, 
+       and perfect integration with the project's 42px height standard.
 
-2. VISUAL & UI STANDARDS (THE "GREEN" THEME):
+2. VISUAL & UI STANDARDS (PERMACULTURE THEME):
 ---------------------------------------------
-To maintain consistency with the Permaculture Admin theme:
+- Standard Height: MUST be exactly 42px to match Select2 and text inputs.
 - Primary Color: #198754 (Success Green).
-- Selection Color: #198754 with white text.
-- Hover State: #f8f9fa (Light Grey) with #198754 text accent.
-- Corners: 1px border radius (rounded-1) to match Bootstrap buttons.
-- Input Group styling: Must integrate with Bootstrap .input-group when needed.
-- Action Buttons: "Select" button must be .btn-success style.
+- Typography: 0.95rem font size for the input field.
+- Icons: Must use Boxicons (e.g., bx-calendar, bx-time) as input group addons.
+- Border: 2px border width on focus with #198754 color.
 
-3. GLOBAL COMPONENT WRAPPER:
-----------------------------
-All implementations should use a centralized wrapper component:
-`resources/js/Components/DateInput.vue`
+3. COMPONENT ARCHITECTURE:
+--------------------------
+Use the specialized component for bilingual forms:
+`resources/js/Components/DateInput.vue` (Standard)
+`resources/js/Components/BilingualDateInput.vue` (For mixed forms)
 
-Default Props for standardized behavior:
-- format: "dd MMM, yyyy" (for Date only)
-- format: "dd MMM, yyyy - hh:mm a" (for DateTime)
-- time-picker-inline: true (where applicable)
-- auto-apply: true (for simple date pickers)
-- close-on-scroll: true
+Standard Formats:
+- Date Only: "Y-m-d" (Backend), display formatted via Flatpickr.
+- Time Only: "H:i" (24-hour format standard for schedules).
 
 4. BILINGUAL SUPPORT (EN/BN):
 ----------------------------
-The datepicker must respond to the application's locale.
-- Locale Mapping:
-  * English: locale="en"
-  * Bangla: locale="bn" (Ensure day/month names are correctly localized).
-- Manual Input: Always allowed and validated.
+The datepicker MUST respond to the application's locale.
+- Localized Month/Day names must be loaded dynamically.
+- Input fields should support Bangla numeral display/input where possible 
+  to maintain the "Bangla-First" UX.
 
-5. PLACEMENT & USABILITY:
+5. USAGE & ACCESSIBILITY:
 -------------------------
-- Z-Index: Must be high enough to clear Modals (default approx 9999).
-- Responsive: Switch to "teleport" mode to avoid clipping in small containers
-              or nested overflow-hidden divs.
-- State: Use .is-invalid class on the picker wrapper if form validation fails.
+- Allow Input: Users must be able to type dates manually (altInput: true).
+- Clear Function: Standard X button (styled like Select2) should be available 
+  for optional date fields.
+- Placement: Teleport to body (static: false) to prevent clipping in 
+  scrollable cards or modals.
 
-6. INSTALLATION COMMAND:
-------------------------
-npm install @vuepic/vue-datepicker
+6. INSTALLATION:
+----------------
+npm install flatpickr
 
 ================================================================================
                 AUTHORIZED BY: USER & ANTIGRAVITY (AI)

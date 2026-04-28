@@ -161,26 +161,26 @@ const getStatusBadge = (status) => {
                             <!-- Left Section: Pagination -->
                             <div class="col-md-auto d-flex align-items-center gap-2">
                                 <span class="small fw-bold text-muted">{{ __('Show') }}</span>
-                                <select v-model="perPage" class="form-select form-select-sm border-secondary-subtle shadow-none w-auto rounded-1">
+                                <Select2 v-model="perPage" class="w-auto">
                                     <option value="5">5</option>
                                     <option value="10">10</option>
                                     <option value="20">20</option>
                                     <option value="50">50</option>
                                     <option value="all">{{ __('All') }}</option>
-                                </select>
+                                </Select2>
                                 <span class="small fw-bold text-muted">{{ __('entries') }}</span>
                             </div>
 
                             <!-- Right Section: Filters + Exports + Search -->
                             <div class="col-md-auto ms-auto d-flex align-items-center">
                                 <!-- Course Filter -->
-                                <div class="me-2" style="min-width: 140px;">
-                                    <select v-model="courseId" class="form-select form-select-sm border-secondary-subtle shadow-none rounded-1">
+                                <div class="me-2" style="min-width: 180px;">
+                                    <Select2 v-model="courseId" :placeholder="__('All Courses')">
                                         <option value="">{{ __('All Courses') }}</option>
                                         <option v-for="course in courses" :key="course.id" :value="course.id">
                                             {{ course.title }}
                                         </option>
-                                    </select>
+                                    </Select2>
                                 </div>
 
                                 <!-- Export Buttons Pack -->
