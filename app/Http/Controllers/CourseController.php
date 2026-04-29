@@ -155,4 +155,20 @@ class CourseController extends Controller
         return redirect()->route('courses.index')
             ->with('message', 'Course deleted successfully!');
     }
+
+    /**
+     * Show the curriculum management page for a course.
+     */
+    public function curriculum(Course $course): Response
+    {
+        $course->load(['topics' => fn($q) => $q->orderBy('order_index')]);
+        
+        return Inertia::render('Courses/Curriculum', [
+            'course' => [
+                'id' => $course->id,
+                'title' => $course->translate('title'),
+                'topics' => $course->topics
+            ]
+        ]);
+    }
 }

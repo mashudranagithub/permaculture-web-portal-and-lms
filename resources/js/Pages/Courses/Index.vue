@@ -232,6 +232,9 @@ const deleteCourse = (course) => {
                                                 <Link :href="route('courses.edit', course.id)" class="btn btn-outline-primary btn-xs rounded-1 p-1 px-2" :title="__('Edit')">
                                                     <i class="bi bi-pencil-square"></i>
                                                 </Link>
+                                                <Link :href="route('courses.curriculum', course.id)" class="btn btn-outline-success btn-xs rounded-1 p-1 px-2" :title="__('Curriculum')">
+                                                    <i class="bi bi-list-check"></i>
+                                                </Link>
                                                 <button @click="deleteCourse(course)" class="btn btn-outline-danger btn-xs rounded-1 p-1 px-2" :title="__('Delete')">
                                                     <i class="bi bi-trash3-fill"></i>
                                                 </button>

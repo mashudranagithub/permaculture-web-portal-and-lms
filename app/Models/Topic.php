@@ -21,6 +21,9 @@ class Topic extends Model
         'topic_type',
         'pdf_file_en',
         'pdf_file_bn',
+        'video_url',
+        'audio_file_en',
+        'audio_file_bn',
         'estimated_duration',
         'is_published',
         'is_free_preview'

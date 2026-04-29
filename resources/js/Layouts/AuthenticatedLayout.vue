@@ -2,6 +2,8 @@
 import { Link, usePage } from '@inertiajs/vue3';
 import { onMounted, ref, computed, watch } from 'vue';
 
+import Swal from 'sweetalert2';
+
 const isSidebarCollapsed = ref(false);
 
 const toggleSidebar = () => {
@@ -31,17 +33,33 @@ onMounted(() => {
     // Basic initialization
 });
 
-const flash = computed(() => usePage().props.flash || {});
-const showFlash = ref(false);
+const page = usePage();
 
-watch(() => usePage().props.flash, (newFlash) => {
-    if (newFlash && newFlash.message) {
-        showFlash.value = true;
-        setTimeout(() => {
-            showFlash.value = false;
-        }, 5000);
+// Global Flash Message Watcher using SweetAlert
+watch(() => page.props.flash, (flash) => {
+    if (flash?.message) {
+        Swal.fire({
+            icon: 'success',
+            title: flash.message,
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true
+        });
     }
-}, { deep: true, immediate: true });
+    if (flash?.error) {
+        Swal.fire({
+            icon: 'error',
+            title: flash.error,
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 4000,
+            timerProgressBar: true
+        });
+    }
+}, { deep: true });
 </script>
 
 <template>
@@ -163,19 +181,6 @@ watch(() => usePage().props.flash, (newFlash) => {
 
         <!-- Main Content -->
         <main class="app-main bg-light min-vh-100 position-relative">
-            <!-- Global Flash Message Toast -->
-            <div v-if="showFlash && $page.props.flash.message" 
-                 class="position-fixed top-0 start-50 translate-middle-x mt-3 z-3 animate__animated animate__fadeInDown">
-                <div class="alert alert-success border-0 shadow-lg d-flex align-items-center rounded-1 py-2 px-4 mb-0" 
-                     role="alert" style="border-left: 5px solid #0f5132 !important;">
-                    <i class="bi bi-check-circle-fill me-3 fs-5"></i>
-                    <div>
-                        <div class="fw-bold small">{{ __('Success!') }}</div>
-                        <div class="small opacity-75">{{ $page.props.flash.message }}</div>
-                    </div>
-                    <button type="button" class="btn-close ms-4 small shadow-none" @click="showFlash = false"></button>
-                </div>
-            </div>
 
             <div class="app-content-header border-bottom bg-white py-3 mb-4" v-if="$slots.header">
                 <div class="container-fluid">

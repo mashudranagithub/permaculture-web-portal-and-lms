@@ -22,7 +22,13 @@ Route::middleware(['auth', 'verified', 'approved'])->group(function () {
     })->name('dashboard');
 
     Route::resource('courses', CourseController::class);
+    Route::get('courses/{course}/curriculum', [CourseController::class, 'curriculum'])->name('courses.curriculum');
+    
     Route::resource('batches', \App\Http\Controllers\BatchController::class);
+
+    // Topic Management
+    Route::post('topics/reorder', [\App\Http\Controllers\TopicController::class, 'reorder'])->name('topics.reorder');
+    Route::resource('topics', \App\Http\Controllers\TopicController::class)->except(['index', 'create', 'show', 'edit']);
 
     // Admin Routes
     Route::middleware(['role:super-admin,admin'])->prefix('admin')->name('admin.')->group(function () {
