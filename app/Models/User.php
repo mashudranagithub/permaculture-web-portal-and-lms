@@ -30,10 +30,14 @@ class User extends Authenticatable implements MustVerifyEmail
         'organization_id',
     ];
 
+    protected $appends = [
+        'avatar_url',
+    ];
+
     /**
      * Get the user's avatar URL.
      */
-    public function getAvatarUrl(): string
+    public function getAvatarUrlAttribute(): string
     {
         return $this->avatar 
             ? asset('storage/' . $this->avatar) 

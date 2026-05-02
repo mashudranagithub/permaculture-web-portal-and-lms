@@ -18,7 +18,7 @@ class OrganizationScope implements Scope
             $user = Auth::user();
 
             // LMS Super Admins can see everything
-            if ($user->hasRole(['super-admin', 'admin']) && !$user->organization_id) {
+            if ($user->hasRole(['super-admin', 'admin'])) {
                 return;
             }
 

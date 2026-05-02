@@ -36,7 +36,7 @@ class HandleInertiaRequests extends Middleware
                     'id' => $request->user()->id,
                     'name' => $request->user()->name,
                     'email' => $request->user()->email,
-                    'avatar_url' => $request->user()->getAvatarUrl(),
+                    'avatar_url' => $request->user()->avatar_url,
                     'roles' => $request->user()->roles->pluck('slug')->toArray(),
                     'permissions' => collect($request->user()->permissions->pluck('slug'))
                         ->merge($request->user()->roles->flatMap->permissions->pluck('slug'))
