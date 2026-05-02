@@ -215,11 +215,24 @@ const getTypeIcon = (type) => {
     }
 };
 
-const totalDuration = computed(() => {
-    return props.course.topics.reduce((acc, topic) => {
+const totalDurationLabel = computed(() => {
+    const totalMinutes = props.course.topics.reduce((acc, topic) => {
         const match = topic.estimated_duration?.match(/\d+/);
         return acc + (match ? parseInt(match[0]) : 0);
     }, 0);
+
+    const translations = page.props.translations || {};
+    const hLabel = translations['Hours'] || 'Hours';
+    const mLabel = translations['Minutes'] || 'Minutes';
+
+    if (totalMinutes >= 60) {
+        const hours = Math.floor(totalMinutes / 60);
+        const mins = totalMinutes % 60;
+        return mins > 0 
+            ? `${hours} ${hLabel} ${mins} ${mLabel}` 
+            : `${hours} ${hLabel}`;
+    }
+    return `${totalMinutes} ${mLabel}`;
 });
 </script>
 
@@ -240,7 +253,7 @@ const totalDuration = computed(() => {
                                 <i class="bx bx-layer me-1"></i>{{ course.topics.length }} {{ __('Topics') }}
                             </span>
                             <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-3 py-1 x-small fw-bold">
-                                <i class="bx bx-time-five me-1"></i>{{ totalDuration }} {{ __('Minutes') }}
+                                <i class="bx bx-time-five me-1"></i>{{ totalDurationLabel }}
                             </span>
                         </div>
                     </div>
@@ -583,8 +596,8 @@ const totalDuration = computed(() => {
 
 .modal-content { min-width: 100% !important; }
 .scrollable-body { max-height: 65vh; overflow-y: auto; }
-.scrollable-body::-webkit-scrollbar { width: 5px; }
-.scrollable-body::-webkit-scrollbar-thumb { background: #eee; border-radius: 10px; }
+.scrollable-body::-webkit-scrollbar { width: 6px; }
+.scrollable-body::-webkit-scrollbar-thumb { background: var(--primary-color, #198754); border-radius: 10px; }
 
 .custom-switch { width: 2.8rem; height: 1.4rem; cursor: pointer; }
 .hover-text-primary:hover { color: #0d6efd !important; }

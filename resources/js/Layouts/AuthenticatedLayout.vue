@@ -185,10 +185,10 @@ watch(() => page.props.flash, (flash) => {
             <div class="app-content-header border-bottom bg-white py-3 mb-4" v-if="$slots.header">
                 <div class="container-fluid">
                     <div class="row align-items-center">
-                        <div class="col-sm-6">
+                        <div class="col-sm-8">
                             <h3 class="mb-0 fw-bold text-dark font-outfit"><slot name="header" /></h3>
                         </div>
-                        <div class="col-sm-6 text-sm-end">
+                        <div class="col-sm-4 text-sm-end">
                             <ol class="breadcrumb float-sm-end mb-0 small">
                                 <li class="breadcrumb-item"><a href="#" class="text-success">{{ __('Home') }}</a></li>
                                 <li class="breadcrumb-item active" aria-current="page">{{ __('Dashboard') }}</li>
