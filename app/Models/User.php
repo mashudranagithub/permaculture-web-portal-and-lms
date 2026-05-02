@@ -9,11 +9,12 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Traits\HasOrganization;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasOrganization;
 
     /**
      * The attributes that are mass assignable.
@@ -26,6 +27,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'is_approved',
         'avatar',
+        'organization_id',
     ];
 
     /**
@@ -118,5 +120,17 @@ class User extends Authenticatable implements MustVerifyEmail
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
+    }
+
+    public function organization(): BelongsTo
+    {
+        return $this->belongsTo(Organization::class);
+    }
+
+    /** Check whether the user's organization is approved and active */
+    public function hasApprovedOrganization(): bool
+    {
+        if (!$this->organization_id) return true; // LMS admins have no org
+        return $this->organization?->isActive() ?? false;
     }
 }

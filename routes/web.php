@@ -30,7 +30,6 @@ Route::middleware(['auth', 'verified', 'approved'])->group(function () {
     Route::post('topics/reorder', [\App\Http\Controllers\TopicController::class, 'reorder'])->name('topics.reorder');
     Route::resource('topics', \App\Http\Controllers\TopicController::class)->except(['index', 'create', 'show', 'edit']);
 
-    // Admin Routes
     Route::middleware(['role:super-admin,admin'])->prefix('admin')->name('admin.')->group(function () {
         // User Management
         Route::middleware('permission:manage-users')->group(function () {
@@ -38,6 +37,18 @@ Route::middleware(['auth', 'verified', 'approved'])->group(function () {
             Route::post('/users', [\App\Http\Controllers\Admin\UserController::class, 'store'])->name('users.store');
             Route::patch('/users/{user}', [\App\Http\Controllers\Admin\UserController::class, 'update'])->name('users.update');
             Route::patch('/users/{user}/approve', [\App\Http\Controllers\Admin\UserController::class, 'approve'])->name('users.approve');
+        });
+
+        // Organization Management (LMS Admin)
+        Route::prefix('organizations')->name('organizations.')->group(function () {
+            Route::get('/',                    [\App\Http\Controllers\Organization\OrganizationController::class, 'index'])->name('index');
+            Route::get('/approvals',           [\App\Http\Controllers\Organization\OrganizationController::class, 'approvalQueue'])->name('queue');
+            Route::get('/{organization}',      [\App\Http\Controllers\Organization\OrganizationController::class, 'show'])->name('show');
+            Route::post('/{organization}/approve',   [\App\Http\Controllers\Organization\OrganizationController::class, 'approve'])->name('approve');
+            Route::post('/{organization}/reject',    [\App\Http\Controllers\Organization\OrganizationController::class, 'reject'])->name('reject');
+            Route::post('/{organization}/suspend',   [\App\Http\Controllers\Organization\OrganizationController::class, 'suspend'])->name('suspend');
+            Route::post('/{organization}/reactivate',[\App\Http\Controllers\Organization\OrganizationController::class, 'reactivate'])->name('reactivate');
+            Route::delete('/{organization}',   [\App\Http\Controllers\Organization\OrganizationController::class, 'destroy'])->name('destroy');
         });
 
         // Roles & Permissions

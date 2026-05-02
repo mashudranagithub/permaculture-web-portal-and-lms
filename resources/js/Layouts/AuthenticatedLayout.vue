@@ -114,7 +114,17 @@ watch(() => page.props.flash, (flash) => {
         <aside class="app-sidebar bg-dark shadow" data-bs-theme="dark">
             <div class="sidebar-brand bg-success">
                 <Link :href="route('dashboard')" class="brand-link text-decoration-none">
-                    <span class="brand-text fw-bold text-white"><i class="bi bi-leaf me-2"></i>Permaculture</span>
+                    <template v-if="$page.props.auth.user.organization">
+                        <div class="d-flex align-items-center w-100 overflow-hidden">
+                            <img :src="$page.props.auth.user.organization.logo_url" alt="Org Logo" class="brand-image shadow-sm me-2" style="max-height: 42px; width: auto; max-width: 60px; object-fit: contain; background: white; padding: 2px; border-radius: 4px;">
+                            <span class="brand-text fw-bold text-white" style="font-size: 0.8rem; line-height: 1.1; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                {{ $page.props.auth.user.organization.name }}
+                            </span>
+                        </div>
+                    </template>
+                    <template v-else>
+                        <span class="brand-text fw-bold text-white"><i class="bi bi-leaf me-2"></i>Permaculture</span>
+                    </template>
                 </Link>
             </div>
             <div class="sidebar-wrapper scrollbar-simple">
@@ -140,6 +150,17 @@ watch(() => page.props.flash, (flash) => {
                             <Link :href="route('batches.index')" class="nav-link" :class="{ 'active': route().current('batches.*') }">
                                 <i class="nav-icon bi bi-collection-fill"></i>
                                 <p>{{ __('Batches') }}</p>
+                            </Link>
+                        </li>
+
+                        <!-- Organizations (LMS Admin only) -->
+                        <li v-if="can('manage-users')" class="nav-header text-uppercase small text-white-50 mt-3">{{ __('Organizations') }}</li>
+                        <li v-if="can('manage-users')" class="nav-item">
+                            <Link :href="route('admin.organizations.queue')" class="nav-link" :class="{ 'active': route().current('admin.organizations.*') }">
+                                <i class="nav-icon bi bi-buildings-fill"></i>
+                                <p class="d-flex align-items-center justify-content-between">
+                                    {{ __('Organizations') }}
+                                </p>
                             </Link>
                         </li>
 

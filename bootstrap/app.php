@@ -18,9 +18,10 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
-            'role' => \App\Http\Middleware\CheckRole::class,
-            'permission' => \App\Http\Middleware\CheckPermission::class,
-            'approved' => \App\Http\Middleware\EnsureUserIsApproved::class,
+            'role'        => \App\Http\Middleware\CheckRole::class,
+            'permission'  => \App\Http\Middleware\CheckPermission::class,
+            'approved'    => \App\Http\Middleware\EnsureUserIsApproved::class,
+            'org.approved' => \App\Http\Middleware\EnsureOrganizationApproved::class,
         ]);
 
         //

@@ -43,6 +43,11 @@ class HandleInertiaRequests extends Middleware
                         ->unique()
                         ->values()
                         ->toArray(),
+                    'organization' => $request->user()->organization ? [
+                        'id' => $request->user()->organization->id,
+                        'name' => $request->user()->organization->name,
+                        'logo_url' => $request->user()->organization->logo_url,
+                    ] : null,
                 ] : null,
             ],
             'translations' => function () {

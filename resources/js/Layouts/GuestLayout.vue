@@ -1,5 +1,8 @@
 <script setup>
 import { Link } from '@inertiajs/vue3';
+const props = defineProps({
+    wide: { type: Boolean, default: false },
+});
 </script>
 
 <template>
@@ -11,7 +14,7 @@ import { Link } from '@inertiajs/vue3';
             </Link>
         </div>
 
-        <div class="card border-0 shadow-lg rounded-4 overflow-hidden w-100" style="max-width: 450px;">
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden w-100" :style="wide ? 'max-width: 760px;' : 'max-width: 450px;'">
             <div class="card-body p-4 p-md-5">
                 <slot />
             </div>

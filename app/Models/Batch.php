@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Traits\HasTranslations;
+use App\Traits\HasOrganization;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -15,9 +16,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Batch extends Model
 {
-    use HasTranslations, SoftDeletes;
+    use HasTranslations, SoftDeletes, HasOrganization;
 
     protected $fillable = [
+        'organization_id',
         'course_id',
         'title',
         'description',
