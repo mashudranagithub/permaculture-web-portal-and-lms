@@ -65,12 +65,27 @@ onUnmounted(() => {
 
 const maxWidthClass = computed(() => {
     return {
-        sm: 'sm:max-w-sm',
-        md: 'sm:max-w-md',
-        lg: 'sm:max-w-lg',
-        xl: 'sm:max-w-xl',
+        'sm': 'sm:max-w-sm',
+        'md': 'sm:max-w-md',
+        'lg': 'sm:max-w-lg',
+        'xl': 'sm:max-w-xl',
         '2xl': 'sm:max-w-2xl',
+        '3xl': 'sm:max-w-3xl',
+        '4xl': 'sm:max-w-4xl',
+        '5xl': 'sm:max-w-5xl',
     }[props.maxWidth];
+});
+
+const customStyle = computed(() => {
+    if (!props.maxWidth) return {};
+    if (props.maxWidth.includes('%') || props.maxWidth.includes('px') || props.maxWidth.includes('vw')) {
+        return { 
+            width: props.maxWidth,
+            maxWidth: props.maxWidth,
+            minWidth: props.maxWidth
+        };
+    }
+    return { width: '100%' };
 });
 </script>
 
@@ -93,7 +108,7 @@ const maxWidthClass = computed(() => {
             >
                 <div
                     v-show="show"
-                    class="fixed inset-0 transform transition-all"
+                    class="fixed inset-0 transform"
                     style="backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);"
                     @click="close"
                 >
@@ -113,8 +128,9 @@ const maxWidthClass = computed(() => {
             >
                 <div
                     v-show="show"
-                    class="mb-6 transform overflow-hidden rounded-lg bg-white shadow-xl transition-all w-full"
+                    class="mb-6 transform overflow-hidden rounded-lg bg-white shadow-xl"
                     :class="maxWidthClass"
+                    :style="customStyle"
                 >
                     <slot v-if="showSlot" />
                 </div>
@@ -122,3 +138,21 @@ const maxWidthClass = computed(() => {
         </div>
     </dialog>
 </template>
+
+<style scoped>
+/* Standard Max Widths in Vanilla CSS */
+.sm\:max-w-sm { max-width: 384px !important; }
+.sm\:max-w-md { max-width: 448px !important; }
+.sm\:max-w-lg { max-width: 512px !important; }
+.sm\:max-w-xl { max-width: 576px !important; }
+.sm\:max-w-2xl { max-width: 672px !important; }
+.sm\:max-w-3xl { max-width: 768px !important; }
+.sm\:max-w-4xl { max-width: 896px !important; }
+.sm\:max-w-5xl { max-width: 1024px !important; }
+
+@media (max-width: 640px) {
+    div[style*="max-width"] {
+        max-width: 95% !important;
+    }
+}
+</style>

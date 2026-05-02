@@ -26,7 +26,8 @@ class Topic extends Model
         'audio_file_bn',
         'estimated_duration',
         'is_published',
-        'is_free_preview'
+        'is_free_preview',
+        'quiz_data'
     ];
 
     protected $casts = [
@@ -36,7 +37,8 @@ class Topic extends Model
         'is_published' => 'boolean',
         'is_free_preview' => 'boolean',
         'order_index' => 'integer',
-        'topic_type' => 'string'
+        'topic_type' => 'string',
+        'quiz_data' => 'array'
     ];
 
     /**

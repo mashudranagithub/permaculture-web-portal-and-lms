@@ -37,13 +37,31 @@ const form = useForm({
     pdf_file_bn: null,
     audio_file_en: null,
     audio_file_bn: null,
+    quiz_data: [],
 });
 
 const openCreateModal = () => {
     editingTopic.value = null;
+    form.clearErrors();
     form.reset();
+    
+    // Force deep reset for objects and specific fields
     form.id = null;
+    form.title = { en: '', bn: '' };
+    form.description = { en: '', bn: '' };
+    form.content_body = { en: '', bn: '' };
+    form.topic_type = 'content';
+    form.video_url = '';
+    form.estimated_duration = '';
+    form.is_published = true;
+    form.is_free_preview = false;
+    form.pdf_file_en = null;
+    form.pdf_file_bn = null;
+    form.audio_file_en = null;
+    form.audio_file_bn = null;
+    form.quiz_data = [];
     form.course_id = props.course.id;
+    
     showTopicModal.value = true;
 };
 
@@ -63,7 +81,72 @@ const openEditModal = (topic) => {
     form.pdf_file_bn = null;
     form.audio_file_en = null;
     form.audio_file_bn = null;
+    form.quiz_data = topic.quiz_data || [];
     showTopicModal.value = true;
+};
+
+const addQuestion = () => {
+    form.quiz_data.push({
+        id: Date.now(),
+        question: { en: '', bn: '' },
+        type: 'mcq',
+        options: [
+            { en: '', bn: '' },
+            { en: '', bn: '' }
+        ],
+        correct_answer: 0,
+        explanation: { en: '', bn: '' },
+        points: 1
+    });
+};
+
+const removeQuestion = (index) => {
+    form.quiz_data.splice(index, 1);
+};
+
+const addOption = (questionIndex) => {
+    form.quiz_data[questionIndex].options.push({ en: '', bn: '' });
+};
+
+const removeOption = (questionIndex, optionIndex) => {
+    if (form.quiz_data[questionIndex].options.length > 2) {
+        form.quiz_data[questionIndex].options.splice(optionIndex, 1);
+    }
+};
+
+const getMediaUrl = (path) => {
+    if (!path) return null;
+    return path.startsWith('http') ? path : `/storage/${path}`;
+};
+
+const MAX_AUDIO_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_PDF_SIZE = 10 * 1024 * 1024;  // 10MB
+
+const handleFileSelect = (event, field, maxSize, label) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const sizeMB = (maxSize / 1024 / 1024).toFixed(0);
+    const fileSizeMB = (file.size / 1024 / 1024).toFixed(1);
+
+    // Helper for translations
+    const translate = (key) => window.__ ? window.__(key) : key;
+
+    if (file.size > maxSize) {
+        const sizeMB = (maxSize / 1024 / 1024).toFixed(0);
+        const fileSizeMB = (file.size / 1024 / 1024).toFixed(1);
+        
+        // Use Inertia's built-in error handling to show the message inline
+        form.setError(field, `The ${label} is too large (${fileSizeMB}MB). Maximum allowed size is ${sizeMB}MB.`);
+        
+        event.target.value = ''; // Reset file input
+        form[field] = null;
+        return;
+    }
+
+    // Clear error if a valid file is selected
+    form.clearErrors(field);
+    form[field] = file;
 };
 
 const submit = () => {
@@ -76,6 +159,9 @@ const submit = () => {
             onSuccess: () => {
                 showTopicModal.value = false;
                 router.reload({ only: ['course'] });
+            },
+            onError: (errors) => {
+                console.error('Topic update errors:', errors);
             }
         });
     } else {
@@ -84,6 +170,9 @@ const submit = () => {
             onSuccess: () => {
                 showTopicModal.value = false;
                 router.reload({ only: ['course'] });
+            },
+            onError: (errors) => {
+                console.error('Topic store errors:', errors);
             }
         });
     }
@@ -120,7 +209,9 @@ const getTypeIcon = (type) => {
         case 'pdf': return 'bx bxs-file-pdf text-warning';
         case 'audio': return 'bx bx-volume-full text-info';
         case 'online_class': return 'bx bx-video text-primary';
-        default: return 'bx bx-file-blank text-success';
+        case 'quiz': return 'bx bx-list-check text-success';
+        case 'assignment': return 'bx bx-task text-warning';
+        default: return 'bx bx-file-blank text-secondary';
     }
 };
 
@@ -230,8 +321,8 @@ const totalDuration = computed(() => {
         </div>
 
         <!-- Vertically Centered Modal -->
-        <Modal :show="showTopicModal" @close="showTopicModal = false" maxWidth="md">
-            <div class="modal-content border-0 rounded-4 overflow-hidden shadow-lg bg-white">
+        <Modal :show="showTopicModal" @close="showTopicModal = false" maxWidth="70%">
+            <div v-if="showTopicModal" class="modal-content border-0 rounded-4 overflow-hidden shadow-lg bg-white">
                 <div class="modal-header border-bottom p-4">
                     <h5 class="modal-title fw-bold text-dark">{{ editingTopic ? __('Edit Topic') : __('Create New Topic') }}</h5>
                     <button type="button" @click="showTopicModal = false" class="btn-close shadow-none"></button>
@@ -256,7 +347,23 @@ const totalDuration = computed(() => {
                                 <input v-model="form.estimated_duration" type="text" class="form-control standard-height border-2" :placeholder="__('e.g. 45 mins')">
                             </div>
 
-                            <div class="col-12 mt-4">
+                            <!-- Common Title Section -->
+                            <div class="col-12 mt-2">
+                                <div class="p-3 bg-white rounded-3 border">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">{{ __('Topic Title (Bangla)') }}</label>
+                                            <input v-model="form.title.bn" type="text" class="form-control standard-height border-2" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">{{ __('Topic Title (English)') }}</label>
+                                            <input v-model="form.title.en" type="text" class="form-control standard-height border-2" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div v-if="form.topic_type !== 'quiz'" class="col-12 mt-4">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <label class="form-label x-small fw-bold text-muted text-uppercase mb-0">{{ __('Bilingual Lesson Content') }}</label>
                                     <div class="btn-group btn-group-sm p-1 bg-light rounded-3 border">
@@ -267,19 +374,108 @@ const totalDuration = computed(() => {
 
                                 <div class="p-3 bg-light rounded-3 border">
                                     <div v-show="activeTab === 'bn'" class="animate__animated animate__fadeIn">
-                                        <div class="mb-3">
-                                            <label class="form-label small fw-bold">{{ __('Lesson Title (Bangla)') }}</label>
-                                            <input v-model="form.title.bn" type="text" class="form-control standard-height border-2" required>
-                                        </div>
                                         <RichTextEditor v-model="form.content_body.bn" :height="250" />
                                     </div>
                                     <div v-show="activeTab === 'en'" class="animate__animated animate__fadeIn">
-                                        <div class="mb-3">
-                                            <label class="form-label small fw-bold">{{ __('Lesson Title (English)') }}</label>
-                                            <input v-model="form.title.en" type="text" class="form-control standard-height border-2" required>
-                                        </div>
                                         <RichTextEditor v-model="form.content_body.en" :height="250" />
                                     </div>
+                                </div>
+                            </div>
+
+                            <!-- Quiz Builder -->
+                            <div v-if="form.topic_type === 'quiz'" class="col-12 mt-4">
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h6 class="fw-bold text-dark mb-0"><i class="bx bx-list-check me-2 text-success"></i>{{ __('Quiz Questions Builder') }}</h6>
+                                    <button type="button" @click="addQuestion" class="btn btn-sm btn-success rounded-pill px-3 shadow-sm">
+                                        <i class="bx bx-plus me-1"></i>{{ __('Add Question') }}
+                                    </button>
+                                </div>
+
+                                <div class="quiz-questions-container">
+                                    <div v-for="(q, qIdx) in form.quiz_data" :key="q.id" class="question-card border rounded-4 p-4 mb-4 bg-white shadow-sm transition-all hover-border-success">
+                                        <div class="d-flex justify-content-between align-items-start mb-4">
+                                            <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2 fw-bold">{{ __('Question') }} {{ qIdx + 1 }}</span>
+                                            <button type="button" @click="removeQuestion(qIdx)" class="btn btn-sm btn-outline-danger border-0 rounded-circle" :title="__('Remove Question')">
+                                                <i class="bx bx-trash fs-5"></i>
+                                            </button>
+                                        </div>
+
+                                        <div class="row g-4">
+                                            <div class="col-md-8">
+                                                <div class="mb-4">
+                                                    <label class="form-label x-small fw-bold text-muted text-uppercase">{{ __('Question Text (English)') }}</label>
+                                                    <input v-model="q.question.en" type="text" class="form-control border-2" required>
+                                                </div>
+                                                <div class="mb-0">
+                                                    <label class="form-label x-small fw-bold text-muted text-uppercase">{{ __('Question Text (Bangla)') }}</label>
+                                                    <input v-model="q.question.bn" type="text" class="form-control border-2" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="mb-4">
+                                                    <label class="form-label x-small fw-bold text-muted text-uppercase">{{ __('Question Type') }}</label>
+                                                    <select v-model="q.type" class="form-select border-2">
+                                                        <option value="mcq">{{ __('Multiple Choice') }}</option>
+                                                        <option value="true_false">{{ __('True / False') }}</option>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-0">
+                                                    <label class="form-label x-small fw-bold text-muted text-uppercase">{{ __('Points') }}</label>
+                                                    <input v-model="q.points" type="number" class="form-control border-2">
+                                                </div>
+                                            </div>
+
+                                            <div v-if="q.type === 'mcq'" class="col-12 mt-4">
+                                                <label class="form-label x-small fw-bold text-muted text-uppercase mb-3 d-block border-bottom pb-2">{{ __('Answer Options') }}</label>
+                                                <div v-for="(opt, oIdx) in q.options" :key="oIdx" class="option-row d-flex gap-3 align-items-start mb-3 animate__animated animate__fadeIn">
+                                                    <div class="form-check pt-2">
+                                                        <input class="form-check-input" type="radio" :name="'correct_'+qIdx" :value="oIdx" v-model="q.correct_answer">
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <input v-model="opt.en" type="text" class="form-control form-control-sm border-2 mb-1" :placeholder="__('Option EN')">
+                                                        <input v-model="opt.bn" type="text" class="form-control form-control-sm border-2" :placeholder="__('Option BN')">
+                                                    </div>
+                                                    <button type="button" @click="removeOption(qIdx, oIdx)" class="btn btn-sm text-danger border-0 pt-2" :disabled="q.options.length <= 2">
+                                                        <i class="bx bx-x fs-4"></i>
+                                                    </button>
+                                                </div>
+                                                <button type="button" @click="addOption(qIdx)" class="btn btn-sm btn-link text-success text-decoration-none fw-bold p-0 mt-2">
+                                                    <i class="bx bx-plus me-1"></i>{{ __('Add Option') }}
+                                                </button>
+                                            </div>
+
+                                            <div v-if="q.type === 'true_false'" class="col-12 mt-4">
+                                                <label class="form-label x-small fw-bold text-muted text-uppercase mb-3 d-block border-bottom pb-2">{{ __('Correct Answer') }}</label>
+                                                <div class="d-flex gap-4">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" :name="'tf_'+qIdx" :value="0" v-model="q.correct_answer" :id="'t_'+qIdx">
+                                                        <label class="form-check-label fw-bold" :for="'t_'+qIdx">{{ __('True') }}</label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" :name="'tf_'+qIdx" :value="1" v-model="q.correct_answer" :id="'f_'+qIdx">
+                                                        <label class="form-check-label fw-bold" :for="'f_'+qIdx">{{ __('False') }}</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-12 mt-4">
+                                                <label class="form-label x-small fw-bold text-muted text-uppercase mb-2">{{ __('Explanation / Feedback') }}</label>
+                                                <div class="row g-3">
+                                                    <div class="col-md-6">
+                                                        <textarea v-model="q.explanation.en" class="form-control border-2" rows="2" :placeholder="__('Explain the answer in English...')"></textarea>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <textarea v-model="q.explanation.bn" class="form-control border-2" rows="2" :placeholder="__('Explain the answer in Bangla...')"></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div v-if="form.quiz_data.length === 0" class="p-5 text-center border rounded-4 bg-light border-dashed">
+                                    <i class="bx bx-question-mark fs-1 text-muted opacity-50 mb-3"></i>
+                                    <p class="text-muted small mb-0">{{ __('No questions added. Click "Add Question" to start building your quiz.') }}</p>
                                 </div>
                             </div>
 
@@ -294,22 +490,52 @@ const totalDuration = computed(() => {
                             <div v-if="form.topic_type === 'pdf'" class="col-12 row g-3">
                                 <div class="col-md-6">
                                     <label class="form-label small fw-bold">{{ __('Bangla PDF') }}</label>
-                                    <input type="file" @input="form.pdf_file_bn = $event.target.files[0]" class="form-control border-2 bg-white" accept=".pdf">
+                                    <input type="file" @change="handleFileSelect($event, 'pdf_file_bn', MAX_PDF_SIZE, 'Bangla PDF')" class="form-control border-2 bg-white" accept=".pdf">
+                                    <div class="x-small text-muted mt-1">{{ __('Max 10MB') }} &bull; PDF</div>
+                                    <div v-if="form.errors.pdf_file_bn" class="text-danger x-small mt-1">{{ form.errors.pdf_file_bn }}</div>
+                                    <div v-if="editingTopic?.pdf_file_bn" class="mt-2">
+                                        <a :href="getMediaUrl(editingTopic.pdf_file_bn)" target="_blank" class="btn btn-sm btn-outline-secondary w-100 py-1">
+                                            <i class="bx bxs-file-pdf me-1"></i>{{ __('View Current PDF') }}
+                                        </a>
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label small fw-bold">{{ __('English PDF') }}</label>
-                                    <input type="file" @input="form.pdf_file_en = $event.target.files[0]" class="form-control border-2 bg-white" accept=".pdf">
+                                    <input type="file" @change="handleFileSelect($event, 'pdf_file_en', MAX_PDF_SIZE, 'English PDF')" class="form-control border-2 bg-white" accept=".pdf">
+                                    <div class="x-small text-muted mt-1">{{ __('Max 10MB') }} &bull; PDF</div>
+                                    <div v-if="form.errors.pdf_file_en" class="text-danger x-small mt-1">{{ form.errors.pdf_file_en }}</div>
+                                    <div v-if="editingTopic?.pdf_file_en" class="mt-2">
+                                        <a :href="getMediaUrl(editingTopic.pdf_file_en)" target="_blank" class="btn btn-sm btn-outline-secondary w-100 py-1">
+                                            <i class="bx bxs-file-pdf me-1"></i>{{ __('View Current PDF') }}
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
 
                             <div v-if="form.topic_type === 'audio'" class="col-12 row g-3">
                                 <div class="col-md-6">
                                     <label class="form-label small fw-bold">{{ __('Bangla Audio') }}</label>
-                                    <input type="file" @input="form.audio_file_bn = $event.target.files[0]" class="form-control border-2 bg-white" accept="audio/*">
+                                    <input type="file" @change="handleFileSelect($event, 'audio_file_bn', MAX_AUDIO_SIZE, 'Bangla Audio')" class="form-control border-2 bg-white" accept="audio/*">
+                                    <div class="x-small text-muted mt-1">{{ __('Max 5MB') }} &bull; MP3, WAV, OGG</div>
+                                    <div v-if="form.errors.audio_file_bn" class="text-danger x-small mt-1">{{ form.errors.audio_file_bn }}</div>
+                                    <div v-if="editingTopic?.audio_file_bn" class="mt-2 p-2 bg-light rounded border">
+                                        <div class="x-small text-muted mb-1">{{ __('Current Audio:') }}</div>
+                                        <audio controls class="w-100" style="height: 35px;">
+                                            <source :src="getMediaUrl(editingTopic.audio_file_bn)" type="audio/mpeg">
+                                        </audio>
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label small fw-bold">{{ __('English Audio') }}</label>
-                                    <input type="file" @input="form.audio_file_en = $event.target.files[0]" class="form-control border-2 bg-white" accept="audio/*">
+                                    <input type="file" @change="handleFileSelect($event, 'audio_file_en', MAX_AUDIO_SIZE, 'English Audio')" class="form-control border-2 bg-white" accept="audio/*">
+                                    <div class="x-small text-muted mt-1">{{ __('Max 5MB') }} &bull; MP3, WAV, OGG</div>
+                                    <div v-if="form.errors.audio_file_en" class="text-danger x-small mt-1">{{ form.errors.audio_file_en }}</div>
+                                    <div v-if="editingTopic?.audio_file_en" class="mt-2 p-2 bg-light rounded border">
+                                        <div class="x-small text-muted mb-1">{{ __('Current Audio:') }}</div>
+                                        <audio controls class="w-100" style="height: 35px;">
+                                            <source :src="getMediaUrl(editingTopic.audio_file_en)" type="audio/mpeg">
+                                        </audio>
+                                    </div>
                                 </div>
                             </div>
 
@@ -355,7 +581,7 @@ const totalDuration = computed(() => {
 
 .ghost-item { opacity: 0.2; background: #e8f5e9 !important; border: 2px dashed #198754 !important; }
 
-.modal-content { min-width: 600px !important; }
+.modal-content { min-width: 100% !important; }
 .scrollable-body { max-height: 65vh; overflow-y: auto; }
 .scrollable-body::-webkit-scrollbar { width: 5px; }
 .scrollable-body::-webkit-scrollbar-thumb { background: #eee; border-radius: 10px; }
@@ -364,4 +590,9 @@ const totalDuration = computed(() => {
 .hover-text-primary:hover { color: #0d6efd !important; }
 .hover-text-danger:hover { color: #dc3545 !important; }
 .hover-text-success:hover { color: #198754 !important; }
+.hover-border-success:hover { border-color: #198754 !important; }
+.border-dashed { border-style: dashed !important; }
+.question-card { transition: border-color 0.2s ease; }
+
 </style>
+
