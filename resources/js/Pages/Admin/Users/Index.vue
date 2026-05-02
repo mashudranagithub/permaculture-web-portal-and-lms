@@ -247,6 +247,7 @@ const generatePassword = () => {
                                         <th @click="toggleSort('email')" class="sorting py-2 cursor-pointer" :class="{ 'sorting_asc': sortField === 'email' && sortDirection === 'asc', 'sorting_desc': sortField === 'email' && sortDirection === 'desc' }">
                                             {{ __('Email Address') }}
                                         </th>
+                                        <th v-if="$page.props.auth.user.roles.includes('super-admin')" class="py-2" style="width: 150px;">{{ __('Organization') }}</th>
                                         <th class="py-2">{{ __('Roles') }}</th>
                                         <th @click="toggleSort('created_at')" class="sorting py-2 cursor-pointer" :class="{ 'sorting_asc': sortField === 'created_at' && sortDirection === 'asc', 'sorting_desc': sortField === 'created_at' && sortDirection === 'desc' }">
                                             {{ __('Joined At') }}
@@ -274,6 +275,12 @@ const generatePassword = () => {
                                         <td class="text-muted">
                                             {{ user.email }}
                                         </td>
+                                        <td v-if="$page.props.auth.user.roles.includes('super-admin')">
+                                            <div v-if="user.organization" class="small fw-bold text-success">
+                                                <i class="bi bi-buildings me-1"></i>{{ user.organization.name }}
+                                            </div>
+                                            <div v-else class="small text-muted italic">Global</div>
+                                        </td>
                                         <td>
                                             <div class="d-flex flex-wrap gap-1">
                                                 <span v-for="role in user.roles" :key="role" class="badge bg-success text-white px-2">
@@ -299,7 +306,7 @@ const generatePassword = () => {
                                         </td>
                                     </tr>
                                     <tr v-if="users.data.length === 0">
-                                        <td colspan="6" class="text-center py-5 text-muted bg-light-subtle">
+                                        <td :colspan="$page.props.auth.user.roles.includes('super-admin') ? 7 : 6" class="text-center py-5 text-muted bg-light-subtle">
                                             {{ __('No users found matching your search.') }}
                                         </td>
                                     </tr>

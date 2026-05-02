@@ -24,7 +24,7 @@ class UserController extends Controller
         $sortField = $request->input('sort_field', 'created_at');
         $sortDirection = $request->input('sort_direction', 'desc');
 
-        $users = User::with(['roles', 'permissions'])
+        $users = User::with(['roles', 'permissions', 'organization:id,name'])
             ->when($request->search, function ($query, $search) {
                 $query->where('name', 'like', "%{$search}%")
                       ->orWhere('email', 'like', "%{$search}%");
@@ -34,6 +34,10 @@ class UserController extends Controller
             ->withQueryString()
             ->through(fn ($user) => [
                 'id' => $user->id,
+                'organization' => $user->organization ? [
+                    'id' => $user->organization->id,
+                    'name' => $user->organization->name,
+                ] : null,
                 'name' => $user->name,
                 'email' => $user->email,
                 'is_approved' => (bool)$user->is_approved,

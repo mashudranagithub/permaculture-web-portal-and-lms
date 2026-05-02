@@ -29,6 +29,12 @@ const toggleAclMenu = () => {
     aclMenuOpen.value = !aclMenuOpen.value;
 };
 
+// Organization Menu State
+const orgMenuOpen = ref(route().current('admin.organizations.*'));
+watch(() => route().current('admin.organizations.*'), (newVal) => {
+    if (newVal) orgMenuOpen.value = true;
+});
+
 onMounted(() => {
     // Basic initialization
 });
@@ -112,18 +118,23 @@ watch(() => page.props.flash, (flash) => {
 
         <!-- Sidebar -->
         <aside class="app-sidebar bg-dark shadow" data-bs-theme="dark">
-            <div class="sidebar-brand bg-success">
-                <Link :href="route('dashboard')" class="brand-link text-decoration-none">
+            <div class="sidebar-brand bg-success py-2">
+                <Link :href="route('dashboard')" class="brand-link text-decoration-none d-flex align-items-center justify-content-center w-100 px-2">
                     <template v-if="$page.props.auth.user.organization">
                         <div class="d-flex align-items-center w-100 overflow-hidden">
-                            <img :src="$page.props.auth.user.organization.logo_url" alt="Org Logo" class="brand-image shadow-sm me-2" style="max-height: 42px; width: auto; max-width: 60px; object-fit: contain; background: white; padding: 2px; border-radius: 4px;">
-                            <span class="brand-text fw-bold text-white" style="font-size: 0.8rem; line-height: 1.1; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                            <img :src="$page.props.auth.user.organization.logo_url" alt="Org Logo" 
+                                class="shadow-sm me-2 bg-white p-1 rounded" 
+                                style="height: 38px; width: 38px; object-fit: contain; min-width: 38px;">
+                            <span class="brand-text fw-bold text-white lh-sm text-start" style="font-size: 0.85rem; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
                                 {{ $page.props.auth.user.organization.name }}
                             </span>
                         </div>
                     </template>
                     <template v-else>
-                        <span class="brand-text fw-bold text-white"><i class="bi bi-leaf me-2"></i>Permaculture</span>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-leaf-fill fs-3 text-white me-2"></i>
+                            <span class="brand-text fw-bold text-white fs-5">Permaculture</span>
+                        </div>
                     </template>
                 </Link>
             </div>
@@ -154,14 +165,32 @@ watch(() => page.props.flash, (flash) => {
                         </li>
 
                         <!-- Organizations (LMS Admin only) -->
-                        <li v-if="can('manage-users')" class="nav-header text-uppercase small text-white-50 mt-3">{{ __('Organizations') }}</li>
-                        <li v-if="can('manage-users')" class="nav-item">
-                            <Link :href="route('admin.organizations.queue')" class="nav-link" :class="{ 'active': route().current('admin.organizations.*') }">
+                        <li v-if="$page.props.auth.user.roles.includes('super-admin')" class="nav-header text-uppercase small text-white-50 mt-3">{{ __('Organizations') }}</li>
+                        <li v-if="$page.props.auth.user.roles.includes('super-admin')" class="nav-item" :class="{ 'menu-open': orgMenuOpen }">
+                            <a href="#" class="nav-link" :class="{ 'active': route().current('admin.organizations.*') }" @click.prevent="orgMenuOpen = !orgMenuOpen">
                                 <i class="nav-icon bi bi-buildings-fill"></i>
-                                <p class="d-flex align-items-center justify-content-between">
+                                <p>
                                     {{ __('Organizations') }}
+                                    <i class="nav-arrow bi bi-chevron-right"></i>
                                 </p>
-                            </Link>
+                            </a>
+                            <ul class="nav nav-treeview" :style="{ display: orgMenuOpen ? 'block' : 'none' }">
+                                <li class="nav-item">
+                                    <Link :href="route('admin.organizations.index')" class="nav-link" :class="{ 'active': route().current('admin.organizations.index') }">
+                                        <i class="nav-icon bi bi-card-list"></i>
+                                        <p>All Organizations</p>
+                                    </Link>
+                                </li>
+                                <li class="nav-item">
+                                    <Link :href="route('admin.organizations.queue')" class="nav-link" :class="{ 'active': route().current('admin.organizations.queue') }">
+                                        <i class="nav-icon bi bi-hourglass-split"></i>
+                                        <p>
+                                            Approval Queue
+                                            <span v-if="$page.props.pendingCount" class="badge bg-warning text-dark ms-auto rounded-pill px-1" style="font-size: 0.65rem;">{{ $page.props.pendingCount }}</span>
+                                        </p>
+                                    </Link>
+                                </li>
+                            </ul>
                         </li>
 
                         <!-- ACL Section -->
@@ -195,6 +224,7 @@ watch(() => page.props.flash, (flash) => {
                                 </li>
                             </ul>
                         </li>
+
                     </ul>
                 </nav>
             </div>

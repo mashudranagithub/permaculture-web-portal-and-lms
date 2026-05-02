@@ -28,6 +28,11 @@ class Organization extends Model
         'settings',
     ];
 
+    protected $appends = [
+        'logo_url',
+        'status_badge',
+    ];
+
     protected $casts = [
         'settings'    => 'array',
         'approved_at' => 'datetime',

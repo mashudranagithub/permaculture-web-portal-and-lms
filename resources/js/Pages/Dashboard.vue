@@ -8,7 +8,17 @@ import { Head, Link } from '@inertiajs/vue3';
 
     <AuthenticatedLayout>
         <template #header>
-            {{ __('Admin Dashboard') }}
+            <div class="d-flex align-items-center gap-2">
+                <div v-if="$page.props.auth.user.organization" class="bg-white p-1 rounded shadow-sm d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                    <img :src="$page.props.auth.user.organization.logo_url" class="img-fluid" style="max-height: 100%; object-fit: contain;">
+                </div>
+                <div>
+                    <span class="fw-bold">{{ __('Admin Dashboard') }}</span>
+                    <div v-if="$page.props.auth.user.organization" class="small text-muted fw-normal" style="font-size: 0.75rem;">
+                        <i class="bi bi-buildings me-1"></i>{{ $page.props.auth.user.organization.name }}
+                    </div>
+                </div>
+            </div>
         </template>
 
         <div class="row g-4">

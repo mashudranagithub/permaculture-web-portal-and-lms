@@ -49,15 +49,15 @@
 - [x] `OrganizationRegistrationController` (Public registration)
 
 ### Step 1.5 — Policies
-- [ ] `OrganizationPolicy` (who can manage orgs)
-- [ ] Update `CoursePolicy`, `BatchPolicy` to check org scope
+- [x] `OrganizationPolicy` (who can manage orgs)
+- [x] Update `CoursePolicy`, `BatchPolicy` to check org scope
 
 ### Step 1.6 — Vue Pages
 - [x] `Pages/Auth/OrgRegister.vue`
 - [x] `Pages/Auth/OrgPending.vue`
 - [x] `Pages/Organizations/ApprovalQueue.vue`
-- [ ] `Pages/Organizations/Index.vue`
-- [ ] `Pages/Organizations/Show.vue`
+- [x] `Pages/Organizations/Index.vue`
+- [x] `Pages/Organizations/Show.vue`
 
 ### Step 1.7 — Routes
 - [x] Add `/admin/organizations` route group (lms-admin middleware)
@@ -69,8 +69,8 @@
 - [x] Show Organization Logo/Name for org users
 
 ### Step 1.9 — Seed / Migrate Existing Data
-- [ ] Backfill `organization_id` on existing courses and batches
-- [ ] Create a default organization for development/testing
+- [x] Backfill `organization_id` on existing courses and batches
+- [x] Create a default organization for development/testing
 
 ---
 

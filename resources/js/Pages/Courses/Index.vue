@@ -174,6 +174,7 @@ const deleteCourse = (course) => {
                                     <tr>
                                         <th class="ps-3 text-center py-2" style="width: 50px;">SL.</th>
                                         <th class="py-2" style="width: 60px;">{{ __('Thumb') }}</th>
+                                        <th v-if="$page.props.auth.user.roles.includes('super-admin')" class="py-2" style="width: 150px;">{{ __('Organization') }}</th>
                                         <th @click="toggleSort('title')" class="sorting py-2 cursor-pointer" :class="{ 'sorting_asc': sortField === 'title' && sortDirection === 'asc', 'sorting_desc': sortField === 'title' && sortDirection === 'desc' }">
                                             {{ __('Course Title') }}
                                         </th>
@@ -196,6 +197,12 @@ const deleteCourse = (course) => {
                                                 <img v-if="course.image_url" :src="course.image_url" class="img-fluid" alt="thumb">
                                                 <i v-else class="bi bi-image text-muted"></i>
                                             </div>
+                                        </td>
+                                        <td v-if="$page.props.auth.user.roles.includes('super-admin')">
+                                            <div v-if="course.organization" class="small fw-bold text-success">
+                                                <i class="bi bi-buildings me-1"></i>{{ course.organization.name }}
+                                            </div>
+                                            <div v-else class="small text-muted italic">Global</div>
                                         </td>
                                         <td>
                                             <div class="fw-bold text-dark">{{ course.title }}</div>
@@ -242,7 +249,7 @@ const deleteCourse = (course) => {
                                         </td>
                                     </tr>
                                     <tr v-if="courses.data.length === 0">
-                                        <td colspan="8" class="text-center py-5 text-muted bg-light-subtle">
+                                        <td :colspan="$page.props.auth.user.roles.includes('super-admin') ? 9 : 8" class="text-center py-5 text-muted bg-light-subtle">
                                             {{ __('No courses found matching your search.') }}
                                         </td>
                                     </tr>

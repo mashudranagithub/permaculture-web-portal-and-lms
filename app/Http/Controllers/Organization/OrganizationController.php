@@ -58,13 +58,12 @@ class OrganizationController extends Controller
      */
     public function show(Organization $organization): Response
     {
+        $organization->loadCount(['users', 'courses', 'batches']);
         $organization->load([
             'approvedBy:id,name',
             'users:id,name,email,organization_id,created_at',
-            'courses:id,organization_id,title,status',
         ]);
-        $organization->append(['logo_url', 'status_badge']);
-
+        
         return Inertia::render('Organizations/Show', [
             'organization' => $organization,
         ]);

@@ -109,7 +109,11 @@ const approveOrg = (org) => {
                                 </div>
 
                                 <!-- Actions -->
-                                <div class="d-flex gap-2 flex-shrink-0">
+                                <div class="d-flex gap-2 flex-shrink-0 align-items-center">
+                                    <Link :href="route('admin.organizations.show', org.id)" 
+                                        class="btn btn-light rounded-circle p-2" title="View Full Details">
+                                        <i class="bx bx-show fs-4"></i>
+                                    </Link>
                                     <button @click="approveOrg(org)"
                                         class="btn btn-success rounded-3 px-4 fw-bold shadow-sm">
                                         <i class="bx bx-check me-1"></i>Approve

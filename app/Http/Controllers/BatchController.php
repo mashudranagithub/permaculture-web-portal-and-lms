@@ -23,7 +23,7 @@ class BatchController extends Controller
         $sortDirection = $request->input('sort_direction', 'desc');
 
         $batches = Batch::query()
-            ->with(['course'])
+            ->with(['course', 'organization:id,name'])
             ->when($request->search, function ($query, $search) {
                 $query->where('title->en', 'like', "%{$search}%")
                       ->orWhere('title->bn', 'like', "%{$search}%")
@@ -42,6 +42,10 @@ class BatchController extends Controller
             ->withQueryString()
             ->through(fn (Batch $batch) => [
                 'id' => $batch->id,
+                'organization' => $batch->organization ? [
+                    'id' => $batch->organization->id,
+                    'name' => $batch->organization->name,
+                ] : null,
                 'course_title' => $batch->course ? $batch->course->translate('title') : 'N/A',
                 'title' => $batch->translate('title'),
                 'start_date' => $batch->start_date ? $batch->start_date->format('d M, Y') : 'N/A',

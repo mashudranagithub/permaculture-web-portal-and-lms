@@ -23,6 +23,7 @@ class CourseController extends Controller
         $sortDirection = $request->input('sort_direction', 'desc');
 
         $courses = Course::query()
+            ->with('organization:id,name')
             ->when($request->search, function ($query, $search) {
                 $query->where('title->en', 'like', "%{$search}%")
                       ->orWhere('title->bn', 'like', "%{$search}%")
@@ -34,6 +35,10 @@ class CourseController extends Controller
             ->withQueryString()
             ->through(fn ($course) => [
                 'id' => $course->id,
+                'organization' => $course->organization ? [
+                    'id' => $course->organization->id,
+                    'name' => $course->organization->name,
+                ] : null,
                 'title' => $course->translate('title'),
                 'slug' => $course->slug,
                 'price' => $course->price,

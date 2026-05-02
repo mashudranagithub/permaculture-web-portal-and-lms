@@ -220,6 +220,7 @@ const getStatusBadge = (status) => {
                                         <th @click="toggleSort('title')" class="sorting py-2 cursor-pointer" :class="{ 'sorting_asc': sortField === 'title' && sortDirection === 'asc', 'sorting_desc': sortField === 'title' && sortDirection === 'desc' }">
                                             {{ __('Batch Title') }}
                                         </th>
+                                        <th v-if="$page.props.auth.user.roles.includes('super-admin')" class="py-2" style="width: 150px;">{{ __('Organization') }}</th>
                                         <th class="py-2">{{ __('Course') }}</th>
                                         <th @click="toggleSort('start_date')" class="sorting py-2 cursor-pointer" :class="{ 'sorting_asc': sortField === 'start_date' && sortDirection === 'asc', 'sorting_desc': sortField === 'start_date' && sortDirection === 'desc' }">
                                             {{ __('Start Date') }}
@@ -240,6 +241,12 @@ const getStatusBadge = (status) => {
                                         <td>
                                             <div class="fw-bold text-dark">{{ batch.title }}</div>
                                             <div class="small text-success fw-bold">৳ {{ Number(batch.price).toLocaleString() }}</div>
+                                        </td>
+                                        <td v-if="$page.props.auth.user.roles.includes('super-admin')">
+                                            <div v-if="batch.organization" class="small fw-bold text-success">
+                                                <i class="bi bi-buildings me-1"></i>{{ batch.organization.name }}
+                                            </div>
+                                            <div v-else class="small text-muted italic">Global</div>
                                         </td>
                                         <td>
                                             <span class="badge bg-light text-dark border fw-normal">{{ batch.course_title }}</span>
@@ -273,7 +280,7 @@ const getStatusBadge = (status) => {
                                         </td>
                                     </tr>
                                     <tr v-if="batches.data.length === 0">
-                                        <td colspan="8" class="text-center py-5 text-muted bg-light-subtle small font-italic">
+                                        <td :colspan="$page.props.auth.user.roles.includes('super-admin') ? 9 : 8" class="text-center py-5 text-muted bg-light-subtle small font-italic">
                                             {{ __('No batches found.') }}
                                         </td>
                                     </tr>
