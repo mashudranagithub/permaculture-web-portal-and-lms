@@ -182,10 +182,11 @@ class CourseController extends Controller
      */
     public function browse(): Response
     {
+        $user = auth()->user();
         $courses = Course::active()
-            ->with(['activeBatches'])
+            ->with(['activeBatches' => fn($q) => $q->where('organization_id', $user->organization_id)])
             ->get()
-            ->map(function (Course $course) {
+            ->map(function (Course $course) use ($user) {
                 return [
                     'id' => $course->id,
                     'title' => $course->translate('title'),
@@ -194,6 +195,9 @@ class CourseController extends Controller
                     'level' => $course->level,
                     'delivery_mode' => $course->delivery_mode,
                     'image_url' => $course->image_url,
+                    'is_enrolled' => \App\Models\Enrollment::where('user_id', $user->id)
+                        ->whereIn('batch_id', $course->batches->pluck('id'))
+                        ->exists(),
                     'active_batches' => $course->activeBatches->map(fn($batch) => [
                         'id' => $batch->id,
                         'title' => $batch->translate('title'),

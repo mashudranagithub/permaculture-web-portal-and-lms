@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Batch;
 use App\Models\Course;
 use App\Models\Enrollment;
+use App\Models\Topic;
+use App\Models\TopicProgress;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -124,16 +126,42 @@ class EnrollmentController extends Controller
             ->where('status', 'active')
             ->firstOrFail();
 
-        // 2. Load Course with Topics
+        // 2. Load Course with Topics and user's progress
         $course->load(['topics' => fn($q) => $q->where('is_published', true)->orderBy('order_index')]);
+        
+        $progress = TopicProgress::where('user_id', Auth::id())
+            ->whereIn('topic_id', $course->topics->pluck('id'))
+            ->get()
+            ->keyBy('topic_id');
 
         return Inertia::render('Student/Learn', [
             'course' => [
                 'id' => $course->id,
                 'title' => $course->translate('title'),
-                'topics' => $course->topics
+                'topics' => $course->topics->map(fn($t) => array_merge($t->toArray(), [
+                    'is_completed' => isset($progress[$t->id]) && $progress[$t->id]->status === 'completed'
+                ]))
             ],
             'initialTopicId' => (int) $request->query('topic_id')
         ]);
+    }
+
+    /**
+     * Mark a topic as completed for the authenticated user.
+     */
+    public function completeTopic(Topic $topic, Request $request): RedirectResponse
+    {
+        TopicProgress::updateOrCreate(
+            [
+                'user_id' => Auth::id(),
+                'topic_id' => $topic->id,
+            ],
+            [
+                'status' => 'completed',
+                'completed_at' => now(),
+            ]
+        );
+
+        return back()->with('message', 'Lesson marked as completed.');
     }
 }

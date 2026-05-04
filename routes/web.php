@@ -74,6 +74,7 @@ Route::middleware(['auth', 'verified', 'approved'])->group(function () {
     Route::post('enrollments', [\App\Http\Controllers\EnrollmentController::class, 'store'])->name('enrollments.store');
     Route::get('my-courses', [\App\Http\Controllers\EnrollmentController::class, 'myCourses'])->name('enrollments.my-courses');
     Route::get('courses/{course}/learn', [\App\Http\Controllers\EnrollmentController::class, 'learn'])->name('enrollments.learn');
+    Route::post('topics/{topic}/complete', [\App\Http\Controllers\EnrollmentController::class, 'completeTopic'])->name('topics.complete');
     Route::get('payments/initiate', [\App\Http\Controllers\PaymentController::class, 'initiate'])->name('payments.initiate');
     Route::post('payments/{enrollment}/mock-success', [\App\Http\Controllers\PaymentController::class, 'mockSuccess'])->name('payments.mock-success');
 

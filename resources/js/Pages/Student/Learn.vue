@@ -1,7 +1,8 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link } from '@inertiajs/vue3';
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
+import { router } from '@inertiajs/vue3';
 
 const props = defineProps({
     course: Object,
@@ -24,6 +25,33 @@ const prevTopic = computed(() => {
     return props.course.topics[index - 1] || null;
 });
 
+const completeLesson = () => {
+    router.post(route('topics.complete', activeTopic.value.id), {}, {
+        preserveScroll: true,
+        onSuccess: () => {
+            // Update local state if needed, but props will update from backend
+            if (nextTopic.value) {
+                selectTopic(nextTopic.value);
+            }
+        }
+    });
+};
+
+const selectedAnswers = ref({});
+
+const selectOption = (qIndex, oIdx) => {
+    selectedAnswers.value[qIndex] = oIdx;
+};
+
+const submitQuiz = () => {
+    // Basic validation: ensure all questions are answered
+    if (activeTopic.value.quiz_data && Object.keys(selectedAnswers.value).length < activeTopic.value.quiz_data.length) {
+        alert('Please answer all questions before submitting.');
+        return;
+    }
+    completeLesson();
+};
+
 const getTypeIcon = (type) => {
     switch(type) {
         case 'video': return 'bi bi-play-btn';
@@ -34,6 +62,20 @@ const getTypeIcon = (type) => {
         case 'assignment': return 'bi bi-journal-text';
         default: return 'bi bi-file-text';
     }
+};
+
+const getPdfUrl = (topic) => {
+    const file = topic.pdf_file_bn || topic.pdf_file_en;
+    if (!file) return null;
+    
+    const url = file.startsWith('http') ? file : `${window.location.origin}/storage/${file}`;
+    
+    // If it's an external URL, wrap it in Google Docs Viewer to avoid X-Frame-Options issues
+    if (url.startsWith('http') && !url.includes(window.location.hostname)) {
+        return `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
+    }
+    
+    return url;
 };
 
 const getYoutubeId = (url) => {
@@ -54,9 +96,11 @@ const getYoutubeId = (url) => {
                 <div class="p-4 border-bottom bg-light">
                     <h6 class="fw-bold mb-1 text-dark">{{ course.title }}</h6>
                     <div class="progress mt-2" style="height: 6px;">
-                        <div class="progress-bar bg-success" role="progressbar" style="width: 15%"></div>
+                        <div class="progress-bar bg-success" role="progressbar" :style="{ width: (course.topics.filter(t => t.is_completed).length / course.topics.length * 100) + '%' }"></div>
                     </div>
-                    <small class="text-muted mt-1 d-block" style="font-size: 0.7rem;">15% Complete (1/{{ course.topics.length }})</small>
+                    <small class="text-muted mt-1 d-block" style="font-size: 0.7rem;">
+                        {{ Math.round(course.topics.filter(t => t.is_completed).length / course.topics.length * 100) }}% Complete ({{ course.topics.filter(t => t.is_completed).length }}/{{ course.topics.length }})
+                    </small>
                 </div>
                 <div class="topic-list scrollbar-simple">
                     <div v-for="(topic, index) in course.topics" :key="topic.id" 
@@ -65,7 +109,7 @@ const getYoutubeId = (url) => {
                         :class="{ 'active bg-success-subtle border-start border-4 border-success': activeTopic.id === topic.id }">
                         <div class="d-flex align-items-center gap-3">
                             <div class="topic-status-icon">
-                                <i v-if="index === 0" class="bi bi-check-circle-fill text-success"></i>
+                                <i v-if="topic.is_completed" class="bi bi-check-circle-fill text-success"></i>
                                 <i v-else class="bi bi-circle text-muted opacity-50"></i>
                             </div>
                             <div class="flex-grow-1 overflow-hidden">
@@ -88,8 +132,11 @@ const getYoutubeId = (url) => {
                         <button v-if="prevTopic" @click="selectTopic(prevTopic)" class="btn btn-outline-secondary btn-sm rounded-pill px-3 fw-bold">
                             <i class="bi bi-arrow-left me-1"></i> {{ __('Previous') }}
                         </button>
-                        <button v-if="nextTopic" @click="selectTopic(nextTopic)" class="btn btn-success btn-sm rounded-pill px-4 fw-bold shadow-sm">
+                        <button v-if="nextTopic" @click="completeLesson" class="btn btn-success btn-sm rounded-pill px-4 fw-bold shadow-sm">
                             {{ __('Next Lesson') }} <i class="bi bi-arrow-right ms-1"></i>
+                        </button>
+                        <button v-else-if="!activeTopic.is_completed" @click="completeLesson" class="btn btn-success btn-sm rounded-pill px-4 fw-bold shadow-sm">
+                            <i class="bi bi-check2-circle me-1"></i> {{ __('Mark as Complete') }}
                         </button>
                     </div>
                 </div>
@@ -122,14 +169,25 @@ const getYoutubeId = (url) => {
                             <div v-html="activeTopic.content_body.bn || activeTopic.content_body.en"></div>
                         </div>
 
-                        <!-- PDF Placeholder -->
-                        <div v-if="activeTopic.topic_type === 'pdf'" class="text-center p-5 bg-white rounded-4 border shadow-sm mb-5">
-                            <i class="bi bi-file-earmark-pdf fs-1 text-danger mb-4 d-block"></i>
-                            <h5 class="fw-bold">{{ __('Download Learning Material') }}</h5>
-                            <p class="text-muted">{{ __('This lesson includes a PDF guide. Please download it below.') }}</p>
-                            <a href="javascript:void(0)" class="btn btn-danger rounded-pill px-5 py-2 fw-bold mt-3 shadow-sm">
-                                <i class="bi bi-download me-2"></i> {{ __('Download PDF') }}
-                            </a>
+                        <!-- PDF Viewer -->
+                        <div v-if="activeTopic.topic_type === 'pdf'" class="mb-5 shadow-lg rounded-4 overflow-hidden bg-white border">
+                            <div v-if="getPdfUrl(activeTopic)" class="pdf-container">
+                                <iframe :src="getPdfUrl(activeTopic)" width="100%" height="800px" style="border: none;"></iframe>
+                                <div class="p-3 bg-light border-top d-flex justify-content-between align-items-center">
+                                    <span class="text-muted small"><i class="bi bi-file-earmark-pdf me-1"></i> {{ __('Design Guide PDF') }}</span>
+                                    <a :href="getPdfUrl(activeTopic)" target="_blank" class="btn btn-outline-danger btn-sm rounded-pill px-4">
+                                        <i class="bi bi-download me-1"></i> {{ __('Download for Offline Reading') }}
+                                    </a>
+                                </div>
+                            </div>
+                            <div v-else class="text-center p-5">
+                                <i class="bi bi-file-earmark-pdf fs-1 text-danger mb-4 d-block"></i>
+                                <h5 class="fw-bold">{{ __('Download Learning Material') }}</h5>
+                                <p class="text-muted">{{ __('This lesson includes a PDF guide. Please download it below.') }}</p>
+                                <a href="javascript:void(0)" class="btn btn-danger rounded-pill px-5 py-2 fw-bold mt-3 shadow-sm">
+                                    <i class="bi bi-download me-2"></i> {{ __('Download PDF') }}
+                                </a>
+                            </div>
                         </div>
 
                         <!-- Quiz Placeholder -->
@@ -142,22 +200,44 @@ const getYoutubeId = (url) => {
                                 <p class="text-muted mb-5">{{ __('Test your knowledge on what you just learned.') }}</p>
                                 
                                 <div v-if="activeTopic.quiz_data" class="text-start">
-                                    <div v-for="(q, index) in activeTopic.quiz_data" :key="index" class="p-4 border rounded-4 mb-4 bg-light">
-                                        <h6 class="fw-bold mb-3">{{ index + 1 }}. {{ q.question.bn || q.question.en }}</h6>
+                                    <div v-for="(q, index) in activeTopic.quiz_data" :key="index" class="p-4 border rounded-4 mb-4 bg-light shadow-sm">
+                                        <h6 class="fw-bold mb-3 d-flex justify-content-between">
+                                            <span>{{ index + 1 }}. {{ q.question.bn || q.question.en }}</span>
+                                            <span class="badge bg-secondary-subtle text-secondary small">{{ q.points }} pts</span>
+                                        </h6>
                                         <div class="d-grid gap-2">
-                                            <div v-for="(opt, oIdx) in q.options" :key="oIdx" class="form-check p-3 border rounded-3 bg-white hover-bg-light cursor-pointer">
-                                                <input class="form-check-input ms-0 me-3" type="radio" :name="'q_'+index" :id="'q_'+index+'_'+oIdx">
+                                            <div v-for="(opt, oIdx) in q.options" :key="oIdx" 
+                                                @click="selectOption(index, oIdx)"
+                                                class="form-check p-3 border rounded-3 bg-white transition-all cursor-pointer d-flex align-items-center"
+                                                :class="{ 'border-success bg-success-subtle shadow-sm': selectedAnswers[index] === oIdx }">
+                                                <input class="form-check-input ms-0 me-3 mt-0" type="radio" 
+                                                    :name="'q_'+index" 
+                                                    :id="'q_'+index+'_'+oIdx"
+                                                    :checked="selectedAnswers[index] === oIdx">
                                                 <label class="form-check-label fw-medium w-100 cursor-pointer" :for="'q_'+index+'_'+oIdx">
                                                     {{ opt.bn || opt.en }}
                                                 </label>
                                             </div>
                                             <div v-if="q.type === 'true_false'" class="d-flex gap-3 mt-2">
-                                                <button class="btn btn-outline-success flex-grow-1 py-2 fw-bold">{{ __('True') }}</button>
-                                                <button class="btn btn-outline-danger flex-grow-1 py-2 fw-bold">{{ __('False') }}</button>
+                                                <button @click="selectOption(index, 1)" 
+                                                    class="btn flex-grow-1 py-2 fw-bold transition-all"
+                                                    :class="selectedAnswers[index] === 1 ? 'btn-success shadow-sm' : 'btn-outline-success'">
+                                                    {{ __('True') }}
+                                                </button>
+                                                <button @click="selectOption(index, 0)" 
+                                                    class="btn flex-grow-1 py-2 fw-bold transition-all"
+                                                    :class="selectedAnswers[index] === 0 ? 'btn-danger shadow-sm' : 'btn-outline-danger'">
+                                                    {{ __('False') }}
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
-                                    <button class="btn btn-success w-100 py-3 rounded-pill fw-bold shadow-lg mt-4">{{ __('Submit Answers') }}</button>
+                                    <button v-if="!activeTopic.is_completed" @click="submitQuiz" class="btn btn-success w-100 py-3 rounded-pill fw-bold shadow-lg mt-4 transition-all">
+                                        <i class="bi bi-send me-2"></i> {{ __('Submit Quiz Answers') }}
+                                    </button>
+                                    <div v-else class="alert alert-success text-center rounded-pill py-3 fw-bold shadow-sm">
+                                        <i class="bi bi-check-circle me-2"></i> {{ __('Quiz Completed Successfully') }}
+                                    </div>
                                 </div>
                             </div>
                         </div>

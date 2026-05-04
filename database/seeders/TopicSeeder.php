@@ -39,6 +39,7 @@ class TopicSeeder extends Seeder
                 [
                     'title' => ['en' => 'Design Guide PDF', 'bn' => 'ডিজাইন গাইড পিডিএফ'],
                     'topic_type' => 'pdf',
+                    'pdf_file_en' => 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf',
                     'order_index' => 3,
                     'estimated_duration' => '30 mins',
                     'is_published' => true,

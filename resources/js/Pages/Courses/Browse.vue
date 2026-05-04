@@ -56,7 +56,18 @@ const enroll = (batchId) => {
                                     </div>
                                 </div>
 
-                                <div v-if="course.active_batches && course.active_batches.length > 0" class="mt-auto">
+                                <div v-if="course.is_enrolled" class="mt-auto">
+                                    <div class="p-4 bg-success-subtle border border-success rounded-4 text-center">
+                                        <div class="mb-2">
+                                            <i class="bi bi-check-circle-fill text-success fs-3"></i>
+                                        </div>
+                                        <div class="fw-bold text-dark mb-3">{{ __('Already Enrolled') }}</div>
+                                        <Link :href="route('enrollments.my-courses')" class="btn btn-success w-100 rounded-pill fw-bold shadow-sm">
+                                            {{ __('Go to My Learning') }}
+                                        </Link>
+                                    </div>
+                                </div>
+                                <div v-else-if="course.active_batches && course.active_batches.length > 0" class="mt-auto">
                                     <div v-for="batch in course.active_batches" :key="batch.id" class="p-3 bg-light rounded-3 border mb-2">
                                         <div class="d-flex justify-content-between align-items-center mb-2">
                                             <span class="small fw-bold text-dark">{{ batch.title }}</span>
