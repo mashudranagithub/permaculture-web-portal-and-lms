@@ -22,6 +22,7 @@ Route::middleware(['auth', 'verified', 'approved'])->group(function () {
     })->name('dashboard');
 
     Route::resource('courses', CourseController::class);
+    Route::get('course-catalog', [CourseController::class, 'browse'])->name('courses.browse');
     Route::get('courses/{course}/curriculum', [CourseController::class, 'curriculum'])->name('courses.curriculum');
     
     Route::resource('batches', \App\Http\Controllers\BatchController::class);
@@ -68,6 +69,13 @@ Route::middleware(['auth', 'verified', 'approved'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Enrollment & Payments
+    Route::post('enrollments', [\App\Http\Controllers\EnrollmentController::class, 'store'])->name('enrollments.store');
+    Route::get('my-courses', [\App\Http\Controllers\EnrollmentController::class, 'myCourses'])->name('enrollments.my-courses');
+    Route::get('courses/{course}/learn', [\App\Http\Controllers\EnrollmentController::class, 'learn'])->name('enrollments.learn');
+    Route::get('payments/initiate', [\App\Http\Controllers\PaymentController::class, 'initiate'])->name('payments.initiate');
+    Route::post('payments/{enrollment}/mock-success', [\App\Http\Controllers\PaymentController::class, 'mockSuccess'])->name('payments.mock-success');
 
     // Media Uploads
     Route::post('/media/upload', [\App\Http\Controllers\MediaController::class, 'upload'])->name('media.upload');

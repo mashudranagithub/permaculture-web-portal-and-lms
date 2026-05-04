@@ -2,9 +2,138 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Batch;
+use App\Models\Course;
+use App\Models\Enrollment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
+use Inertia\Response;
+use Illuminate\Http\RedirectResponse;
+use Carbon\Carbon;
 
 class EnrollmentController extends Controller
 {
-    //
+    /**
+     * Display the student's enrolled courses.
+     */
+    public function myCourses(): Response
+    {
+        $enrollments = Enrollment::where('user_id', Auth::id())
+            ->with(['batch.course'])
+            ->latest()
+            ->get()
+            ->map(fn($enr) => [
+                'id' => $enr->id,
+                'enrollment_no' => $enr->enrollment_no,
+                'status' => $enr->status,
+                'payment_status' => $enr->payment_status,
+                'enrolled_at' => $enr->enrolled_at?->format('d M, Y'),
+                'course' => [
+                    'id' => $enr->batch->course->id,
+                    'title' => $enr->batch->course->translate('title'),
+                    'slug' => $enr->batch->course->slug,
+                    'image_url' => $enr->batch->course->image_url,
+                ],
+                'batch' => [
+                    'id' => $enr->batch->id,
+                    'title' => $enr->batch->translate('title'),
+                ]
+            ]);
+
+        return Inertia::render('Student/MyCourses', [
+            'enrollments' => $enrollments
+        ]);
+    }
+
+    /**
+     * Handle a new enrollment request.
+     */
+    public function store(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'batch_id' => 'required|exists:batches,id',
+        ]);
+
+        $batch = Batch::findOrFail($request->batch_id);
+        $user = Auth::user();
+
+        // 1. Check if enrollment is open
+        if (!$batch->is_enrollment_open) {
+            return back()->with('error', 'Enrollment is currently closed for this batch.');
+        }
+
+        // 2. Check deadline
+        if ($batch->enrollment_deadline && $batch->enrollment_deadline->isPast()) {
+            return back()->with('error', 'Enrollment deadline has passed.');
+        }
+
+        // 3. Check already enrolled
+        $existing = Enrollment::where('user_id', $user->id)
+            ->where('batch_id', $batch->id)
+            ->first();
+
+        if ($existing) {
+            return back()->with('error', 'You are already enrolled in this batch.');
+        }
+
+        // 4. Check seat capacity
+        if ($batch->capacity > 0 && $batch->available_seats <= 0) {
+            return back()->with('error', 'Sorry, this batch is already full.');
+        }
+
+        // 5. Calculate Final Price
+        $price = $batch->price;
+        if ($batch->discount_amount > 0) {
+            $price = $batch->discount_type === 'percentage' 
+                ? $price - ($price * ($batch->discount_amount / 100))
+                : $price - $batch->discount_amount;
+        }
+
+        // 6. Create Enrollment
+        $enrollment = Enrollment::create([
+            'organization_id' => $batch->organization_id,
+            'user_id' => $user->id,
+            'batch_id' => $batch->id,
+            'enrollment_no' => 'ENR-' . strtoupper(uniqid()),
+            'price_at_enrollment' => $price,
+            'status' => $price > 0 ? 'pending' : 'active',
+            'payment_status' => $price > 0 ? 'pending' : 'paid',
+            'enrolled_at' => $price > 0 ? null : now(),
+        ]);
+
+        if ($price > 0) {
+            return redirect()->route('payments.initiate', ['enrollment_id' => $enrollment->id])
+                ->with('message', 'Enrollment initiated. Please complete the payment.');
+        }
+
+        return redirect()->route('enrollments.my-courses')
+            ->with('message', 'Successfully enrolled in ' . $batch->translate('title'));
+    }
+
+    /**
+     * Show the learning interface for a course.
+     */
+    public function learn(Course $course, Request $request): Response
+    {
+        // 1. Verify Enrollment
+        $enrollment = Enrollment::where('user_id', Auth::id())
+            ->where('batch_id', function($query) use ($course) {
+                $query->select('id')->from('batches')->where('course_id', $course->id);
+            })
+            ->where('status', 'active')
+            ->firstOrFail();
+
+        // 2. Load Course with Topics
+        $course->load(['topics' => fn($q) => $q->where('is_published', true)->orderBy('order_index')]);
+
+        return Inertia::render('Student/Learn', [
+            'course' => [
+                'id' => $course->id,
+                'title' => $course->translate('title'),
+                'topics' => $course->topics
+            ],
+            'initialTopicId' => (int) $request->query('topic_id')
+        ]);
+    }
 }

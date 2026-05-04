@@ -33,6 +33,10 @@ class Course extends Model
         'is_active'
     ];
 
+    protected $appends = [
+        'image_url',
+    ];
+
     protected $casts = [
         'title' => 'array',
         'description' => 'array',
@@ -45,6 +49,22 @@ class Course extends Model
         'delivery_mode' => 'string',
         'status' => 'string'
     ];
+
+    /**
+     * Get the course's image URL.
+     */
+    public function getImageUrlAttribute(): string
+    {
+        if (!$this->image) {
+            return 'https://images.unsplash.com/photo-1592419044706-39796d40f98c?auto=format&fit=crop&q=80&w=800';
+        }
+
+        if (str_starts_with($this->image, 'http')) {
+            return $this->image;
+        }
+
+        return asset('storage/' . $this->image);
+    }
 
     /**
      * Get the batches for the course.
@@ -76,5 +96,13 @@ class Course extends Model
     public function activeBatches()
     {
         return $this->batches()->where('is_enrollment_open', true)->where('status', 'upcoming');
+    }
+
+    /**
+     * Scope to filter active/published courses.
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'published')->where('is_active', true);
     }
 }

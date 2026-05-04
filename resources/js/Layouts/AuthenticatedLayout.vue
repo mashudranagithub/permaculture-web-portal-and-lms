@@ -164,6 +164,21 @@ watch(() => page.props.flash, (flash) => {
                             </Link>
                         </li>
 
+                        <!-- Student Section -->
+                        <li class="nav-header text-uppercase small text-white-50 mt-3">{{ __('Student') }}</li>
+                        <li class="nav-item">
+                            <Link :href="route('enrollments.my-courses')" class="nav-link" :class="{ 'active': route().current('enrollments.my-courses') }">
+                                <i class="nav-icon bi bi-display"></i>
+                                <p>{{ __('My Learning') }}</p>
+                            </Link>
+                        </li>
+                        <li class="nav-item">
+                            <Link :href="route('courses.browse')" class="nav-link" :class="{ 'active': route().current('courses.browse') }">
+                                <i class="nav-icon bi bi-search"></i>
+                                <p>{{ __('Browse Catalog') }}</p>
+                            </Link>
+                        </li>
+
                         <!-- Organizations (LMS Admin only) -->
                         <li v-if="$page.props.auth.user.roles.includes('super-admin')" class="nav-header text-uppercase small text-white-50 mt-3">{{ __('Organizations') }}</li>
                         <li v-if="$page.props.auth.user.roles.includes('super-admin')" class="nav-item" :class="{ 'menu-open': orgMenuOpen }">

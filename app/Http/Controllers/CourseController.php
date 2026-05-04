@@ -176,4 +176,36 @@ class CourseController extends Controller
             ]
         ]);
     }
+
+    /**
+     * Display a public-style course catalog for logged-in students.
+     */
+    public function browse(): Response
+    {
+        $courses = Course::active()
+            ->with(['activeBatches'])
+            ->get()
+            ->map(function (Course $course) {
+                return [
+                    'id' => $course->id,
+                    'title' => $course->translate('title'),
+                    'short_description' => $course->translate('short_description'),
+                    'duration' => $course->duration,
+                    'level' => $course->level,
+                    'delivery_mode' => $course->delivery_mode,
+                    'image_url' => $course->image_url,
+                    'active_batches' => $course->activeBatches->map(fn($batch) => [
+                        'id' => $batch->id,
+                        'title' => $batch->translate('title'),
+                        'price' => $batch->price,
+                        'start_date' => $batch->start_date?->format('d M, Y'),
+                        'available_seats' => $batch->available_seats,
+                    ])
+                ];
+            });
+
+        return Inertia::render('Courses/Browse', [
+            'courses' => $courses
+        ]);
+    }
 }
