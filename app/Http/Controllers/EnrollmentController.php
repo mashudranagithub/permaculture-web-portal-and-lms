@@ -22,26 +22,41 @@ class EnrollmentController extends Controller
     public function myCourses(): Response
     {
         $enrollments = Enrollment::where('user_id', Auth::id())
-            ->with(['batch.course'])
+            ->with(['batch.course.topics' => fn($q) => $q->where('is_published', true)])
             ->latest()
             ->get()
-            ->map(fn($enr) => [
-                'id' => $enr->id,
-                'enrollment_no' => $enr->enrollment_no,
-                'status' => $enr->status,
-                'payment_status' => $enr->payment_status,
-                'enrolled_at' => $enr->enrolled_at?->format('d M, Y'),
-                'course' => [
-                    'id' => $enr->batch->course->id,
-                    'title' => $enr->batch->course->translate('title'),
-                    'slug' => $enr->batch->course->slug,
-                    'image_url' => $enr->batch->course->image_url,
-                ],
-                'batch' => [
-                    'id' => $enr->batch->id,
-                    'title' => $enr->batch->translate('title'),
-                ]
-            ]);
+            ->map(function($enr) {
+                $topics = $enr->batch->course->topics;
+                $totalTopics = $topics->count();
+                
+                $completedTopics = TopicProgress::where('user_id', Auth::id())
+                    ->whereIn('topic_id', $topics->pluck('id'))
+                    ->where('status', 'completed')
+                    ->count();
+                
+                $progressPercent = $totalTopics > 0 ? min(100, round(($completedTopics / $totalTopics) * 100)) : 0;
+
+                return [
+                    'id' => $enr->id,
+                    'enrollment_no' => $enr->enrollment_no,
+                    'status' => $enr->status,
+                    'payment_status' => $enr->payment_status,
+                    'enrolled_at' => $enr->enrolled_at?->format('d M, Y'),
+                    'progress_percent' => $progressPercent,
+                    'completed_count' => $completedTopics,
+                    'total_count' => $totalTopics,
+                    'course' => [
+                        'id' => $enr->batch->course->id,
+                        'title' => $enr->batch->course->translate('title'),
+                        'slug' => $enr->batch->course->slug,
+                        'image_url' => $enr->batch->course->image_url,
+                    ],
+                    'batch' => [
+                        'id' => $enr->batch->id,
+                        'title' => $enr->batch->translate('title'),
+                    ]
+                ];
+            });
 
         return Inertia::render('Student/MyCourses', [
             'enrollments' => $enrollments

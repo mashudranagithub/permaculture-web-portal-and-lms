@@ -47,7 +47,7 @@ class CourseController extends Controller
                 'is_online' => $course->is_online,
                 'is_active' => $course->is_active,
                 'status' => $course->status,
-                'image_url' => $course->image ? asset('storage/' . $course->image) : null,
+                'image_url' => $course->image_url,
             ]);
 
         return Inertia::render('Courses/Index', [
@@ -195,9 +195,18 @@ class CourseController extends Controller
                     'level' => $course->level,
                     'delivery_mode' => $course->delivery_mode,
                     'image_url' => $course->image_url,
+                    'organization' => $course->organization ? [
+                        'name' => $course->organization->name,
+                        'initials' => collect(explode(' ', $course->organization->name))->map(fn($n) => mb_substr($n, 0, 1))->join(''),
+                    ] : null,
                     'is_enrolled' => \App\Models\Enrollment::where('user_id', $user->id)
                         ->whereIn('batch_id', $course->batches->pluck('id'))
+                        ->where('status', 'active')
                         ->exists(),
+                    'pending_enrollment_id' => \App\Models\Enrollment::where('user_id', $user->id)
+                        ->whereIn('batch_id', $course->batches->pluck('id'))
+                        ->where('status', 'pending')
+                        ->value('id'),
                     'active_batches' => $course->activeBatches->map(fn($batch) => [
                         'id' => $batch->id,
                         'title' => $batch->translate('title'),
