@@ -64,6 +64,12 @@ Route::middleware(['auth', 'verified', 'approved'])->group(function () {
             Route::get('/courses/pdf', [\App\Http\Controllers\Admin\ReportController::class, 'downloadCourses'])->name('courses.pdf');
             Route::get('/batches/pdf', [\App\Http\Controllers\Admin\ReportController::class, 'downloadBatches'])->name('batches.pdf');
         });
+
+        // Organization Settings (For Org Admins)
+        Route::prefix('settings')->name('settings.')->group(function () {
+            Route::get('/payment', [\App\Http\Controllers\Organization\SettingsController::class, 'payment'])->name('payment');
+            Route::post('/payment', [\App\Http\Controllers\Organization\SettingsController::class, 'updatePayment'])->name('payment.update');
+        });
     });
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -77,6 +83,10 @@ Route::middleware(['auth', 'verified', 'approved'])->group(function () {
     Route::post('topics/{topic}/complete', [\App\Http\Controllers\EnrollmentController::class, 'completeTopic'])->name('topics.complete');
     Route::get('payments/initiate', [\App\Http\Controllers\PaymentController::class, 'initiate'])->name('payments.initiate');
     Route::post('payments/{enrollment}/mock-success', [\App\Http\Controllers\PaymentController::class, 'mockSuccess'])->name('payments.mock-success');
+
+    // bKash Routes
+    Route::post('bkash/pay/{enrollment}', [\App\Http\Controllers\BkashController::class, 'pay'])->name('bkash.pay');
+    Route::get('bkash/callback', [\App\Http\Controllers\BkashController::class, 'callback'])->name('bkash.callback');
 
     // Media Uploads
     Route::post('/media/upload', [\App\Http\Controllers\MediaController::class, 'upload'])->name('media.upload');

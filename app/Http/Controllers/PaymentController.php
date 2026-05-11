@@ -36,6 +36,10 @@ class PaymentController extends Controller
                 'amount' => $enrollment->price_at_enrollment,
                 'course_title' => $enrollment->batch->course->translate('title'),
                 'batch_title' => $enrollment->batch->translate('title'),
+            ],
+            'gateways' => [
+                'bkash' => (bool) ($enrollment->organization->settings['payment_gateways']['bkash']['active'] ?? false),
+                'sslcommerz' => (bool) ($enrollment->organization->settings['payment_gateways']['sslcommerz']['active'] ?? false),
             ]
         ]);
     }
@@ -45,7 +49,7 @@ class PaymentController extends Controller
      */
     public function mockSuccess(Request $request, Enrollment $enrollment): RedirectResponse
     {
-        $amount = $enrollment->price_at_enrollment;
+        $amount = $enrollment->price_at_enrollment ?? 0;
         
         $payment = Payment::create([
             'organization_id' => $enrollment->organization_id,

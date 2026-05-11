@@ -240,6 +240,15 @@ watch(() => page.props.flash, (flash) => {
                             </ul>
                         </li>
 
+                        <!-- Settings Section -->
+                        <li v-if="$page.props.auth.user.organization && ($page.props.auth.user.roles.includes('admin') || $page.props.auth.user.roles.includes('super-admin'))" class="nav-header text-uppercase small text-white-50 mt-3">{{ __('Organization Settings') }}</li>
+                        <li v-if="$page.props.auth.user.organization && ($page.props.auth.user.roles.includes('admin') || $page.props.auth.user.roles.includes('super-admin'))" class="nav-item">
+                            <Link :href="route('admin.settings.payment')" class="nav-link" :class="{ 'active': route().current('admin.settings.payment') }">
+                                <i class="nav-icon bi bi-gear-wide-connected"></i>
+                                <p>{{ __('Payment Gateways') }}</p>
+                            </Link>
+                        </li>
+
                     </ul>
                 </nav>
             </div>
