@@ -9,7 +9,7 @@ const props = defineProps({
     <div class="min-vh-100 d-flex flex-column align-items-center justify-content-center bg-light px-3 py-5" style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);">
         <div class="mb-4">
             <Link href="/" class="text-decoration-none d-flex flex-column align-items-center">
-                <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-lg" style="width: 70px; height: 70px; font-size: 24px;">PM</div>
+                <img src="/favicon.png" alt="Logo" class="rounded-circle shadow-lg" style="width: 80px; height: 80px; object-fit: cover; border: 3px solid #fff;">
                 <h4 class="mt-3 fw-bold text-success text-uppercase tracking-wider font-outfit">{{ __('Permaculture Methods') }}</h4>
             </Link>
         </div>

@@ -12,12 +12,12 @@
 
         <div style="text-align: right; font-size: 8px; color: #aaa;">Verify ID: {{ $certificate_no }}</div>
 
-        <div style="margin-top: 5px; text-align: center;">
-            @if($organization['logo'])
-                <img src="{{ public_path('storage/' . $organization['logo']) }}" style="max-height: 60px;">
+        <div style="margin-top: 10px; text-align: center;">
+            @if($organization['logo_path'] && file_exists($organization['logo_path']))
+                <img src="{{ $organization['logo_path'] }}" style="max-height: 80px;">
             @else
                 <div
-                    style="font-size: 16px; font-weight: bold; color: #198754; font-family: sans-serif; text-transform: uppercase;">
+                    style="font-size: 24px; font-weight: bold; color: #198754; font-family: sans-serif; text-transform: uppercase; letter-spacing: 2px;">
                     {{ $organization['name'] }}
                 </div>
             @endif
@@ -51,7 +51,7 @@
                 </td>
                 <td style="width: 35%; text-align: right; vertical-align: bottom;">
                     <barcode code="{{ $verify_url }}" type="QR" size="0.65" error="M" />
-                    <div style="font-size: 8px; color: #999; margin-top: 2px;">Verify</div>
+                    <div style="font-size: 8px; color: #999; margin-top: 2px;">Verify Authenticity</div>
                 </td>
             </tr>
         </table>

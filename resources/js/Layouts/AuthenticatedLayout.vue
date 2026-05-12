@@ -132,7 +132,7 @@ watch(() => page.props.flash, (flash) => {
                     </template>
                     <template v-else>
                         <div class="d-flex align-items-center">
-                            <i class="bi bi-leaf-fill fs-3 text-white me-2"></i>
+                            <img src="/favicon.png" alt="Logo" class="rounded-circle bg-white p-1 me-2" style="height: 32px; width: 32px; object-fit: cover;">
                             <span class="brand-text fw-bold text-white fs-5">Permaculture</span>
                         </div>
                     </template>

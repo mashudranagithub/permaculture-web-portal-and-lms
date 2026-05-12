@@ -81,8 +81,9 @@ class CertificateService
             'course' => $certificate->metadata['course_title'] ?? $certificate->course->translate('title'),
             'organization' => [
                 'name' => $certificate->metadata['organization_name'] ?? $certificate->organization->name,
-                'logo' => $certificate->organization->logo
+                'logo_path' => $certificate->organization->logo ? storage_path('app/public/' . $certificate->organization->logo) : null
             ],
+            'favicon_path' => public_path('favicon.png'),
             'issue_date' => \Carbon\Carbon::parse($certificate->issue_date)->format('d M, Y'),
             'certificate_no' => $certificate->certificate_no,
             'verify_url' => route('certificates.verify', $certificate->verification_token)
