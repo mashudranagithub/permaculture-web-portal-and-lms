@@ -56,9 +56,14 @@ const props = defineProps({
                                         <div v-if="enr.payment_status === 'paid'">{{ enr.completed_count }}/{{ enr.total_count }} {{ __('Lessons') }}</div>
                                     </div>
                                     <template v-if="enr.payment_status === 'paid'">
-                                        <Link :href="route('enrollments.learn', enr.course.id)" class="btn btn-success rounded-pill px-4 fw-bold shadow-sm transition-all hover-lift">
-                                            {{ enr.progress_percent > 0 ? __('Resume') : __('Start') }}
-                                        </Link>
+                                        <div class="d-flex gap-2">
+                                            <a v-if="enr.certificate" :href="route('certificates.download', enr.certificate.id)" target="_blank" class="btn btn-outline-success rounded-pill px-3 fw-bold shadow-sm transition-all hover-lift d-flex align-items-center gap-1">
+                                                <i class="bi bi-patch-check-fill"></i> {{ __('Certificate') }}
+                                            </a>
+                                            <Link :href="route('enrollments.learn', enr.course.id)" class="btn btn-success rounded-pill px-4 fw-bold shadow-sm transition-all hover-lift">
+                                                {{ enr.progress_percent > 0 ? __('Resume') : __('Start') }}
+                                            </Link>
+                                        </div>
                                     </template>
                                     <template v-else>
                                         <Link :href="route('payments.initiate', { enrollment_id: enr.id })" class="btn btn-warning rounded-pill px-4 fw-bold shadow-sm transition-all hover-lift">

@@ -54,7 +54,7 @@
  - [ ] **Result Analytics**: Pass/Fail logic based on percentage thresholds.
  
  ### 💳 Financial Integration
- - [ ] **Real Gateway Integration**: Preparing bKash/SSLCommerz API endpoints.
+ - [x] **Real Gateway Integration**: Integrated bKash (Tokenized API) and SSLCommerz (Hosted Checkout).
  - [ ] **Digital Receipts**: Generating PDF invoices for successful enrollments.
  
  ---
@@ -88,7 +88,7 @@
  | **Module 7: Payments** | 30% | 🚧 In Progress |
  | **Module 1: Web Portal** | 10% | 📋 Planned |
  | **Module 2: Membership** | 5% | 📋 Planned |
- | **Module 6: Certificates** | 0% | 📋 Planned |
+ | **Module 6: Certificates** | 100% | ✅ Done |
  | **Module 8: Books Store** | 0% | 📋 Planned |
  
  *Last Updated: 05 May, 2026 (Enrollment, LMS Progress & PDF Viewer Finalized)*

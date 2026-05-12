@@ -88,9 +88,30 @@ Route::middleware(['auth', 'verified', 'approved'])->group(function () {
     Route::post('bkash/pay/{enrollment}', [\App\Http\Controllers\BkashController::class, 'pay'])->name('bkash.pay');
     Route::get('bkash/callback', [\App\Http\Controllers\BkashController::class, 'callback'])->name('bkash.callback');
 
+    // SSLCommerz Routes
+    Route::post('sslcommerz/pay/{enrollment}', [\App\Http\Controllers\SSLCommerzController::class, 'pay'])->name('sslcommerz.pay');
+    Route::post('sslcommerz/success', [\App\Http\Controllers\SSLCommerzController::class, 'success'])->name('sslcommerz.success');
+    Route::post('sslcommerz/fail', [\App\Http\Controllers\SSLCommerzController::class, 'fail'])->name('sslcommerz.fail');
+    Route::post('sslcommerz/cancel', [\App\Http\Controllers\SSLCommerzController::class, 'cancel'])->name('sslcommerz.cancel');
+    Route::post('sslcommerz/ipn', [\App\Http\Controllers\SSLCommerzController::class, 'ipn'])->name('sslcommerz.ipn');
+
     // Media Uploads
     Route::post('/media/upload', [\App\Http\Controllers\MediaController::class, 'upload'])->name('media.upload');
+
+    // Certificates
+    Route::get('certificates', [\App\Http\Controllers\CertificateController::class, 'index'])->name('admin.certificates.index');
+    Route::get('certificates/{certificate}/download', [\App\Http\Controllers\CertificateController::class, 'download'])->name('certificates.download');
+
+    // Students (Organization View)
+    Route::get('students', [\App\Http\Controllers\Admin\StudentListController::class, 'index'])->name('admin.students.index');
+    Route::get('students/{user}', [\App\Http\Controllers\Admin\StudentListController::class, 'show'])->name('admin.students.show');
+
+    // Student Specific
+    Route::get('my-certificates', [\App\Http\Controllers\CertificateController::class, 'studentCertificates'])->name('student.certificates');
 });
+
+// Public Certificate Verification
+Route::get('verify/{token}', [\App\Http\Controllers\CertificateController::class, 'verify'])->name('certificates.verify');
 
 Route::get('lang/{locale}', function ($locale) {
     if (in_array($locale, ['en', 'bn'])) {

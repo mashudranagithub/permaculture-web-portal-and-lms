@@ -24,7 +24,12 @@ return Application::configure(basePath: dirname(__DIR__))
             'org.approved' => \App\Http\Middleware\EnsureOrganizationApproved::class,
         ]);
 
-        //
+        $middleware->validateCsrfTokens(except: [
+            'sslcommerz/success',
+            'sslcommerz/fail',
+            'sslcommerz/cancel',
+            'sslcommerz/ipn',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

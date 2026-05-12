@@ -43,4 +43,10 @@ return [
         'password' => env('BKASH_PASSWORD'),
     ],
 
+    'sslcommerz' => [
+        'sandbox' => env('SSLCOMMERZ_SANDBOX', true),
+        'store_id' => env('SSLCOMMERZ_STORE_ID'),
+        'store_password' => env('SSLCOMMERZ_STORE_PASSWORD'),
+    ],
+
 ];

@@ -16,6 +16,10 @@ const submitMock = () => {
 const submitBkash = () => {
     form.post(route('bkash.pay', props.enrollment.id));
 };
+
+const submitSslcommerz = () => {
+    form.post(route('sslcommerz.pay', props.enrollment.id));
+};
 </script>
 
 <template>
@@ -77,16 +81,21 @@ const submitBkash = () => {
 
                                             <!-- SSLCommerz/Cards Button -->
                                             <div v-if="gateways.sslcommerz"
-                                                class="payment-card p-4 rounded-4 border-2 border-light bg-light opacity-75 d-flex align-items-center gap-4 mb-3"
+                                                @click="submitSslcommerz"
+                                                class="payment-card p-4 rounded-4 border-2 transition-all d-flex align-items-center gap-4 mb-3 position-relative"
+                                                :class="[form.processing ? 'opacity-50 pointer-events-none' : 'border-primary-subtle bg-white hover-scale shadow-sm']"
                                             >
-                                                <div class="bg-white p-3 rounded-3 shadow-sm text-primary">
+                                                <div class="bg-primary-subtle p-3 rounded-3 text-primary">
                                                     <img src="/images/gateways/sslcommerz.png" alt="SSLCommerz" height="25">
                                                 </div>
                                                 <div class="flex-grow-1">
-                                                    <h6 class="fw-bold mb-0 text-muted">{{ __('Cards & Net Banking') }}</h6>
+                                                    <h6 class="fw-bold mb-0 text-dark">{{ __('Cards & Net Banking') }}</h6>
                                                     <small class="text-muted">{{ __('Visa, MasterCard, and Local Banks') }}</small>
                                                 </div>
-                                                <span class="badge bg-secondary-subtle text-secondary rounded-pill x-small px-2">Soon</span>
+                                                <i class="bi bi-chevron-right text-muted"></i>
+                                                <div class="position-absolute top-0 end-0 p-2 me-2">
+                                                    <span class="badge bg-primary-subtle text-primary rounded-pill x-small px-2">Secure</span>
+                                                </div>
                                             </div>
                                         </div>
 
@@ -192,6 +201,9 @@ const submitBkash = () => {
 .hover-scale:hover { transform: translateY(-5px); box-shadow: 0 15px 30px -10px rgba(0,0,0,0.1) !important; border-color: #f06292 !important; }
 .payment-card { border: 2px solid transparent; }
 .bg-pink-subtle { background-color: #fce4ec; }
+.bg-primary-subtle { background-color: #e3f2fd; }
+.border-pink-subtle { border-color: #f8bbd0 !important; }
+.border-primary-subtle { border-color: #bbdefb !important; }
 .bg-light-subtle { background-color: #f8f9fa; }
 .transition-all { transition: all 0.2s ease; }
 .hover-text-dark:hover { color: #212529 !important; }

@@ -173,6 +173,12 @@ watch(() => page.props.flash, (flash) => {
                             </Link>
                         </li>
                         <li class="nav-item">
+                            <Link :href="route('student.certificates')" class="nav-link" :class="{ 'active': route().current('student.certificates') }">
+                                <i class="nav-icon bi bi-patch-check"></i>
+                                <p>{{ __('My Certificates') }}</p>
+                            </Link>
+                        </li>
+                        <li class="nav-item">
                             <Link :href="route('courses.browse')" class="nav-link" :class="{ 'active': route().current('courses.browse') }">
                                 <i class="nav-icon bi bi-search"></i>
                                 <p>{{ __('Browse Catalog') }}</p>
@@ -246,6 +252,21 @@ watch(() => page.props.flash, (flash) => {
                             <Link :href="route('admin.settings.payment')" class="nav-link" :class="{ 'active': route().current('admin.settings.payment') }">
                                 <i class="nav-icon bi bi-gear-wide-connected"></i>
                                 <p>{{ __('Payment Gateways') }}</p>
+                            </Link>
+                        </li>
+
+                        <!-- Admin Management -->
+                        <li v-if="!$page.props.auth.user.roles.includes('student')" class="nav-header text-uppercase small text-white-50 mt-3">{{ __('Management') }}</li>
+                        <li v-if="!$page.props.auth.user.roles.includes('student')" class="nav-item">
+                            <Link :href="route('admin.students.index')" class="nav-link" :class="{ 'active': route().current('admin.students.index') }">
+                                <i class="nav-icon bi bi-people-fill"></i>
+                                <p>{{ __('Students') }}</p>
+                            </Link>
+                        </li>
+                        <li v-if="!$page.props.auth.user.roles.includes('student')" class="nav-item">
+                            <Link :href="route('admin.certificates.index')" class="nav-link" :class="{ 'active': route().current('admin.certificates.index') }">
+                                <i class="nav-icon bi bi-patch-check-fill"></i>
+                                <p>{{ __('Certificates') }}</p>
                             </Link>
                         </li>
 

@@ -7,6 +7,8 @@ use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\Topic;
 use App\Models\TopicProgress;
+use App\Models\Certificate;
+use App\Services\CertificateService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -16,6 +18,13 @@ use Carbon\Carbon;
 
 class EnrollmentController extends Controller
 {
+    protected CertificateService $certificateService;
+
+    public function __construct(CertificateService $certificateService)
+    {
+        $this->certificateService = $certificateService;
+    }
+
     /**
      * Display the student's enrolled courses.
      */
@@ -36,6 +45,15 @@ class EnrollmentController extends Controller
                 
                 $progressPercent = $totalTopics > 0 ? min(100, round(($completedTopics / $totalTopics) * 100)) : 0;
 
+                // Auto-issue if 100% and missing (Retroactive support)
+                $certificate = Certificate::where('user_id', Auth::id())
+                    ->where('batch_id', $enr->batch_id)
+                    ->first(['id', 'certificate_no']);
+
+                if (!$certificate && $progressPercent >= 100) {
+                    $certificate = $this->certificateService->checkAndIssue($enr);
+                }
+
                 return [
                     'id' => $enr->id,
                     'enrollment_no' => $enr->enrollment_no,
@@ -54,7 +72,8 @@ class EnrollmentController extends Controller
                     'batch' => [
                         'id' => $enr->batch->id,
                         'title' => $enr->batch->translate('title'),
-                    ]
+                    ],
+                    'certificate' => $certificate
                 ];
             });
 
@@ -176,6 +195,16 @@ class EnrollmentController extends Controller
                 'completed_at' => now(),
             ]
         );
+
+        // Check and Issue Certificate
+        $enrollment = Enrollment::where('user_id', Auth::id())
+            ->where('batch_id', function($query) use ($topic) {
+                $query->select('id')->from('batches')->where('course_id', $topic->course_id);
+            })->first();
+
+        if ($enrollment) {
+            $this->certificateService->checkAndIssue($enrollment);
+        }
 
         return back()->with('message', 'Lesson marked as completed.');
     }
