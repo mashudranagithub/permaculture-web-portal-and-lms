@@ -1,6 +1,6 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head, router, Link } from '@inertiajs/vue3';
+import { Head, router, Link, useForm } from '@inertiajs/vue3';
 import { ref, watch } from 'vue';
 
 const props = defineProps({
@@ -12,6 +12,36 @@ const search = ref(props.filters.search);
 const perPage = ref(props.filters.per_page || 10);
 const sortField = ref(props.filters.sort_field || 'created_at');
 const sortDirection = ref(props.filters.sort_direction || 'desc');
+
+const createForm = useForm({
+    name: '',
+    email: '',
+    password: '',
+});
+
+const openCreateModal = () => {
+    createForm.reset();
+    const modal = new window.bootstrap.Modal(document.getElementById('createStudentModal'));
+    modal.show();
+};
+
+const createStudent = () => {
+    createForm.post(route('admin.students.store'), {
+        onSuccess: () => {
+            const modal = window.bootstrap.Modal.getInstance(document.getElementById('createStudentModal'));
+            modal.hide();
+        }
+    });
+};
+
+const generatePassword = () => {
+    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()";
+    let pass = "";
+    for (let i = 0; i < 12; i++) {
+        pass += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    createForm.password = pass;
+};
 
 const debounce = (fn, delay) => {
     let timeoutId;
@@ -51,15 +81,60 @@ const exportData = (type) => {
         Name: u.name,
         Email: u.email,
         Courses: u.enrollments_count,
-        Joined: u.created_at
+        Joined: new Date(u.created_at).toLocaleDateString()
     }));
 
     if (type === 'copy') {
         const text = data.map(obj => Object.values(obj).join('\t')).join('\n');
         navigator.clipboard.writeText(text);
         alert(__('Data copied to clipboard!'));
+    } else if (type === 'csv' || type === 'excel') {
+        const headers = Object.keys(data[0]).join(',');
+        const rows = data.map(obj => Object.values(obj).map(v => `"${v}"`).join(',')).join('\n');
+        const blob = new Blob([headers + '\n' + rows], { type: 'text/csv;charset=utf-8;' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `students_report_${new Date().toISOString().slice(0, 10)}.${type === 'csv' ? 'csv' : 'xlsx'}`;
+        a.click();
+    } else if (type === 'print' || type === 'pdf') {
+        const printWindow = window.open('', '_blank');
+        const tableHtml = `
+            <html>
+            <head>
+                <title>Student Report - PRINT</title>
+                <style>
+                    body { font-family: sans-serif; padding: 30px; color: #333; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                    th, td { border: 1px solid #000; padding: 10px; text-align: left; font-size: 11px; }
+                    th { background-color: #f0f0f0; font-weight: bold; text-transform: uppercase; }
+                    h2 { color: #198754; margin-top: 0; border-bottom: 2px solid #198754; padding-bottom: 10px; }
+                    .footer { margin-top: 20px; font-size: 10px; color: #666; text-align: right; }
+                </style>
+            </head>
+            <body>
+                <h2>Student Management Report</h2>
+                <p><strong>Generated on:</strong> ${new Date().toLocaleString()}</p>
+                <table>
+                    <thead>
+                        <tr>${Object.keys(data[0]).map(h => `<th>${h}</th>`).join('')}</tr>
+                    </thead>
+                    <tbody>
+                        ${data.map(row => `<tr>${Object.values(row).map(v => `<td>${v}</td>`).join('')}</tr>`).join('')}
+                    </tbody>
+                </table>
+                <div class="footer">Generated via Permaculture LMS System</div>
+                <script>
+                    window.onload = function() {
+                        setTimeout(function() { window.print(); }, 500);
+                    }
+                <\/script>
+            </body>
+            </html>
+        `;
+        printWindow.document.write(tableHtml);
+        printWindow.document.close();
     }
-    // Other export logic could be added here
 };
 </script>
 
@@ -79,6 +154,9 @@ const exportData = (type) => {
                             <h3 class="card-title fw-bold text-dark mb-0 d-flex align-items-center gap-2">
                                 <i class="bi bi-people-fill text-success"></i>{{ __('Organization Students') }}
                             </h3>
+                            <button @click="openCreateModal" class="btn btn-success btn-sm rounded-1 px-4 shadow-sm fw-bold">
+                                <i class="bi bi-person-plus-fill me-2"></i>{{ __('Add Student') }}
+                            </button>
                         </div>
                         
                         <div class="mt-4 row g-3 align-items-center">
@@ -94,9 +172,11 @@ const exportData = (type) => {
                                 <span class="small fw-bold text-muted">{{ __('entries') }}</span>
                             </div>
                             <div class="col-md-auto ms-md-auto d-flex align-items-center gap-2">
-                                <div class="btn-group btn-group-sm shadow-sm rounded-1 overflow-visible border">
-                                    <button @click="exportData('copy')" class="btn btn-light border-0 px-2 text-nowrap d-flex align-items-center"><i class="bi bi-clipboard me-2 small text-secondary"></i>{{ __('Copy') }}</button>
-                                </div>
+                                    <button @click="exportData('copy')" class="btn btn-light border-0 px-2 text-nowrap d-flex align-items-center" title="Copy"><i class="bi bi-clipboard me-2 small text-secondary"></i>{{ __('Copy') }}</button>
+                                    <button @click="exportData('csv')" class="btn btn-light border-0 px-2 border-start text-nowrap d-flex align-items-center" title="CSV"><i class="bi bi-file-earmark-spreadsheet me-2 small text-info"></i>CSV</button>
+                                    <button @click="exportData('excel')" class="btn btn-light border-0 px-2 border-start text-nowrap d-flex align-items-center" title="Excel"><i class="bi bi-file-earmark-excel me-2 small text-success"></i>Excel</button>
+                                    <button @click="exportData('pdf')" class="btn btn-light border-0 px-2 border-start text-nowrap d-flex align-items-center" title="PDF"><i class="bi bi-file-earmark-pdf-fill me-2 small text-danger"></i>PDF</button>
+                                    <button @click="exportData('print')" class="btn btn-light border-0 px-2 border-start text-nowrap d-flex align-items-center" title="Print"><i class="bi bi-printer me-2 small text-dark"></i>{{ __('Print') }}</button>
 
                                 <div class="input-group input-group-sm rounded-1 overflow-hidden border shadow-sm">
                                     <span class="input-group-text bg-white border-0 text-muted px-2"><i class="bi bi-search"></i></span>
@@ -185,6 +265,48 @@ const exportData = (type) => {
                             </ul>
                         </nav>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Create Student Modal -->
+        <div class="modal fade" id="createStudentModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg rounded-1 overflow-hidden">
+                    <form @submit.prevent="createStudent">
+                        <div class="modal-header bg-success text-white border-bottom py-2 px-4">
+                            <h6 class="modal-title fw-bold">
+                                <i class="bi bi-person-plus-fill me-2"></i>{{ __('Create New Student') }}
+                            </h6>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body p-4">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small text-uppercase text-muted">{{ __('Full Name') }}</label>
+                                <input v-model="createForm.name" type="text" class="form-control rounded-1 border-success-subtle shadow-sm px-3 py-2" placeholder="John Doe" required>
+                                <div v-if="createForm.errors.name" class="text-danger small mt-1">{{ createForm.errors.name }}</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold small text-uppercase text-muted">{{ __('Email Address') }}</label>
+                                <input v-model="createForm.email" type="email" class="form-control rounded-1 border-success-subtle shadow-sm px-3 py-2" placeholder="john@example.com" required>
+                                <div v-if="createForm.errors.email" class="text-danger small mt-1">{{ createForm.errors.email }}</div>
+                            </div>
+                            <div class="mb-0">
+                                <label class="form-label fw-bold small text-uppercase text-muted">{{ __('Password') }}</label>
+                                <div class="input-group">
+                                    <input v-model="createForm.password" type="text" class="form-control rounded-start-1 border-success-subtle shadow-sm px-3 py-2" placeholder="At least 8 characters" required>
+                                    <button @click.prevent="generatePassword" class="btn btn-outline-success border-success-subtle rounded-end-1" type="button"><i class="bi bi-magic me-2"></i>{{ __('Generate') }}</button>
+                                </div>
+                                <div v-if="createForm.errors.password" class="text-danger small mt-1">{{ createForm.errors.password }}</div>
+                            </div>
+                        </div>
+                        <div class="modal-footer border-top p-2 px-4 bg-light">
+                            <button type="button" class="btn btn-light btn-sm rounded-1 px-4 fw-bold border" data-bs-dismiss="modal">{{ __('Cancel') }}</button>
+                            <button type="submit" class="btn btn-success btn-sm rounded-1 px-4 fw-bold shadow-sm" :disabled="createForm.processing">
+                                <i class="bi bi-save me-2"></i> {{ __('Create Student') }}
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

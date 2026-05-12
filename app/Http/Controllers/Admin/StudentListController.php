@@ -9,9 +9,39 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use App\Models\Role;
 
 class StudentListController extends Controller
 {
+    /**
+     * Store a newly created student.
+     */
+    public function store(Request $request): \Illuminate\Http\RedirectResponse
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8',
+        ]);
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'organization_id' => Auth::user()->organization_id,
+            'is_approved' => true,
+            'email_verified_at' => now(),
+        ]);
+
+        $studentRole = Role::where('slug', 'student')->first();
+        if ($studentRole) {
+            $user->roles()->attach($studentRole->id);
+        }
+
+        return back()->with('message', 'Student created successfully.');
+    }
+
     /**
      * Display a listing of students for the organization.
      */

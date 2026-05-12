@@ -36,11 +36,8 @@ class OrganizationRegistrationController extends Controller
         $request->validate([
             'org_name'             => 'required|string|max:255',
             'org_email'            => 'required|email|unique:organizations,email',
-            'org_phone'            => 'nullable|string|max:30',
-            'org_address'          => 'nullable|string|max:500',
-            'org_website'          => 'nullable|url|max:255',
-            'org_description'      => 'nullable|string|max:1000',
-            'org_logo'             => 'nullable|image|mimes:jpg,jpeg,png,svg|max:2048',
+            'org_phone'            => 'required|string|max:30',
+            'org_logo'             => 'required|image|mimes:jpg,jpeg,png,svg|max:2048',
             // Admin account credentials
             'admin_name'           => 'required|string|max:255',
             'admin_email'          => 'required|email|unique:users,email',
@@ -48,14 +45,12 @@ class OrganizationRegistrationController extends Controller
         ]);
 
         // 1. Handle logo upload
-        $logoPath = null;
-        if ($request->hasFile('org_logo')) {
-            $logoPath = $request->file('org_logo')->store('organizations/logos', 'public');
-        }
+        $logoPath = $request->file('org_logo')->store('organizations/logos', 'public');
 
         // 2. Create the organization (status = pending)
         $organization = Organization::create([
             'name'        => $request->org_name,
+            'slug'        => \Illuminate\Support\Str::slug($request->org_name),
             'email'       => $request->org_email,
             'phone'       => $request->org_phone,
             'address'     => $request->org_address,
@@ -74,10 +69,10 @@ class OrganizationRegistrationController extends Controller
             'is_approved'     => false, // blocked until org is approved
         ]);
 
-        // 4. Assign org-admin role
-        $orgAdminRole = Role::where('slug', 'org-admin')->first();
-        if ($orgAdminRole) {
-            $user->roles()->attach($orgAdminRole->id);
+        // 4. Assign admin role
+        $adminRole = Role::where('slug', 'admin')->first();
+        if ($adminRole) {
+            $user->roles()->attach($adminRole->id);
         }
 
         // 5. Fire Registered event → triggers email verification

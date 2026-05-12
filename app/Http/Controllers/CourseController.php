@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Models\Course;
+use App\Models\Enrollment;
 use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Http\RedirectResponse;
@@ -16,6 +17,7 @@ class CourseController extends Controller
      */
     public function index(Request $request): Response
     {
+        $user = auth()->user();
         $perPage = $request->input('per_page', 10);
         if ($perPage === 'all') $perPage = Course::count() ?: 10;
 
@@ -24,6 +26,10 @@ class CourseController extends Controller
 
         $courses = Course::query()
             ->with('organization:id,name')
+            // Scope to organization for students and organization admins
+            ->when(!$user->hasRole('super-admin'), function ($query) use ($user) {
+                $query->where('organization_id', $user->organization_id);
+            })
             ->when($request->search, function ($query, $search) {
                 $query->where('title->en', 'like', "%{$search}%")
                       ->orWhere('title->bn', 'like', "%{$search}%")
@@ -49,6 +55,41 @@ class CourseController extends Controller
                 'status' => $course->status,
                 'image_url' => $course->image_url,
             ]);
+
+        if ($user->hasRole('student')) {
+            $enrollments = Enrollment::where('user_id', $user->id)
+                ->join('batches', 'enrollments.batch_id', '=', 'batches.id')
+                ->select('batches.course_id', 'enrollments.status', 'enrollments.id as enrollment_id')
+                ->get()
+                ->keyBy('course_id');
+
+            $studentCourses = Course::active()
+                ->where('organization_id', $user->organization_id)
+                ->with(['activeBatches'])
+                ->get()
+                ->map(function($c) use ($enrollments) {
+                    $enrollment = $enrollments->get($c->id);
+                    return [
+                        'id' => $c->id,
+                        'title' => $c->translate('title'),
+                        'short_description' => $c->translate('short_description'),
+                        'level' => $c->level,
+                        'image_url' => $c->image_url,
+                        'is_enrolled' => !!$enrollment,
+                        'enrollment_status' => $enrollment ? $enrollment->status : null,
+                        'enrollment_id' => $enrollment ? $enrollment->enrollment_id : null,
+                        'active_batches' => $c->activeBatches->map(fn($b) => [
+                            'id' => $b->id,
+                            'price' => $b->price,
+                            'title' => $b->translate('title')
+                        ])
+                    ];
+                });
+
+            return Inertia::render('Courses/StudentBrowse', [
+                'courses' => $studentCourses
+            ]);
+        }
 
         return Inertia::render('Courses/Index', [
             'courses' => $courses,
@@ -184,9 +225,24 @@ class CourseController extends Controller
     {
         $user = auth()->user();
         $courses = Course::active()
-            ->with(['activeBatches' => fn($q) => $q->where('organization_id', $user->organization_id)])
+            ->with(['organization', 'activeBatches'])
             ->get()
             ->map(function (Course $course) use ($user) {
+                $isEnrolled = false;
+                $pendingEnrollmentId = null;
+
+                if ($user) {
+                    $isEnrolled = \App\Models\Enrollment::where('user_id', $user->id)
+                        ->whereIn('batch_id', $course->batches->pluck('id'))
+                        ->where('status', 'active')
+                        ->exists();
+                    
+                    $pendingEnrollmentId = \App\Models\Enrollment::where('user_id', $user->id)
+                        ->whereIn('batch_id', $course->batches->pluck('id'))
+                        ->where('status', 'pending')
+                        ->value('id');
+                }
+
                 return [
                     'id' => $course->id,
                     'title' => $course->translate('title'),
@@ -199,14 +255,8 @@ class CourseController extends Controller
                         'name' => $course->organization->name,
                         'initials' => collect(explode(' ', $course->organization->name))->map(fn($n) => mb_substr($n, 0, 1))->join(''),
                     ] : null,
-                    'is_enrolled' => \App\Models\Enrollment::where('user_id', $user->id)
-                        ->whereIn('batch_id', $course->batches->pluck('id'))
-                        ->where('status', 'active')
-                        ->exists(),
-                    'pending_enrollment_id' => \App\Models\Enrollment::where('user_id', $user->id)
-                        ->whereIn('batch_id', $course->batches->pluck('id'))
-                        ->where('status', 'pending')
-                        ->value('id'),
+                    'is_enrolled' => $isEnrolled,
+                    'pending_enrollment_id' => $pendingEnrollmentId,
                     'active_batches' => $course->activeBatches->map(fn($batch) => [
                         'id' => $batch->id,
                         'title' => $batch->translate('title'),

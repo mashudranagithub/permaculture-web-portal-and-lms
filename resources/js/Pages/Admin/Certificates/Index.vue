@@ -44,6 +44,67 @@ const toggleSort = (field) => {
     }
     updateTable();
 };
+const exportData = (type) => {
+    const data = props.certificates.data.map((c, index) => ({
+        SL: (props.certificates.current_page - 1) * props.certificates.per_page + index + 1,
+        'Cert No': c.certificate_no,
+        Student: c.user?.name,
+        Course: c.course?.title?.bn || c.course?.title?.en,
+        Issued: new Date(c.issue_date).toLocaleDateString()
+    }));
+
+    if (type === 'copy') {
+        const text = data.map(obj => Object.values(obj).join('\t')).join('\n');
+        navigator.clipboard.writeText(text);
+        alert(__('Data copied to clipboard!'));
+    } else if (type === 'csv' || type === 'excel') {
+        const headers = Object.keys(data[0]).join(',');
+        const rows = data.map(obj => Object.values(obj).map(v => `"${v}"`).join(',')).join('\n');
+        const blob = new Blob([headers + '\n' + rows], { type: 'text/csv;charset=utf-8;' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `certificates_report_${new Date().toISOString().slice(0, 10)}.${type === 'csv' ? 'csv' : 'xlsx'}`;
+        a.click();
+    } else if (type === 'print' || type === 'pdf') {
+        const printWindow = window.open('', '_blank');
+        const tableHtml = `
+            <html>
+            <head>
+                <title>Certificate Report - PRINT</title>
+                <style>
+                    body { font-family: sans-serif; padding: 30px; color: #333; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                    th, td { border: 1px solid #000; padding: 10px; text-align: left; font-size: 11px; }
+                    th { background-color: #f0f0f0; font-weight: bold; text-transform: uppercase; }
+                    h2 { color: #198754; margin-top: 0; border-bottom: 2px solid #198754; padding-bottom: 10px; }
+                    .footer { margin-top: 20px; font-size: 10px; color: #666; text-align: right; }
+                </style>
+            </head>
+            <body>
+                <h2>Certificate Issuance Report</h2>
+                <p><strong>Generated on:</strong> ${new Date().toLocaleString()}</p>
+                <table>
+                    <thead>
+                        <tr>${Object.keys(data[0]).map(h => `<th>${h}</th>`).join('')}</tr>
+                    </thead>
+                    <tbody>
+                        ${data.map(row => `<tr>${Object.values(row).map(v => `<td>${v}</td>`).join('')}</tr>`).join('')}
+                    </tbody>
+                </table>
+                <div class="footer">Generated via Permaculture LMS System</div>
+                <script>
+                    window.onload = function() {
+                        setTimeout(function() { window.print(); }, 500);
+                    }
+                <\/script>
+            </body>
+            </html>
+        `;
+        printWindow.document.write(tableHtml);
+        printWindow.document.close();
+    }
+};
 </script>
 
 <template>
@@ -74,7 +135,14 @@ const toggleSort = (field) => {
                                     <option value="all">{{ __('All') }}</option>
                                 </select>
                             </div>
-                            <div class="col-md-auto ms-md-auto">
+                            <div class="col-md-auto ms-md-auto d-flex align-items-center gap-2">
+                                <div class="btn-group btn-group-sm shadow-sm rounded-1 overflow-visible border text-muted">
+                                    <button @click="exportData('copy')" class="btn btn-light border-0 px-2 text-nowrap d-flex align-items-center" title="Copy"><i class="bi bi-clipboard me-2 small text-secondary"></i>{{ __('Copy') }}</button>
+                                    <button @click="exportData('csv')" class="btn btn-light border-0 px-2 border-start text-nowrap d-flex align-items-center" title="CSV"><i class="bi bi-file-earmark-spreadsheet me-2 small text-info"></i>CSV</button>
+                                    <button @click="exportData('excel')" class="btn btn-light border-0 px-2 border-start text-nowrap d-flex align-items-center" title="Excel"><i class="bi bi-file-earmark-excel me-2 small text-success"></i>Excel</button>
+                                    <button @click="exportData('pdf')" class="btn btn-light border-0 px-2 border-start text-nowrap d-flex align-items-center" title="PDF"><i class="bi bi-file-earmark-pdf-fill me-2 small text-danger"></i>PDF</button>
+                                    <button @click="exportData('print')" class="btn btn-light border-0 px-2 border-start text-nowrap d-flex align-items-center" title="Print"><i class="bi bi-printer me-2 small text-dark"></i>{{ __('Print') }}</button>
+                                </div>
                                 <div class="input-group input-group-sm rounded-1 overflow-hidden border shadow-sm">
                                     <span class="input-group-text bg-white border-0 text-muted px-2"><i class="bi bi-search"></i></span>
                                     <input v-model="search" type="text" class="form-control border-0 ps-0 shadow-none" :placeholder="__('Search...')" style="min-width: 200px;">

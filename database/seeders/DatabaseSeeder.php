@@ -62,6 +62,11 @@ class DatabaseSeeder extends Seeder
             $admin->roles()->sync([$adminRole->id]);
         }
 
+        // 4. Set up Master Organization and Backfill data
+        $this->call([
+            MasterOrganizationSeeder::class,
+        ]);
+
         echo "Seeding completed! \n";
         echo "Login: [EMAIL_ADDRESS] \n";
         echo "Password: password \n";

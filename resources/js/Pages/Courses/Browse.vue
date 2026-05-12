@@ -1,6 +1,6 @@
 <script setup>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head, Link, useForm } from '@inertiajs/vue3';
+import PublicLayout from '@/Layouts/PublicLayout.vue';
+import { Head, Link, useForm, usePage, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
 const props = defineProps({
@@ -14,6 +14,11 @@ const form = useForm({
 const enrolling = ref(null);
 
 const enroll = (batchId) => {
+    if (!usePage().props.auth.user) {
+        router.get(route('register'), { batch_id: batchId });
+        return;
+    }
+    
     enrolling.value = batchId;
     form.batch_id = batchId;
     form.post(route('enrollments.store'), {
@@ -25,15 +30,14 @@ const enroll = (batchId) => {
 <template>
     <Head :title="__('Browse Courses')" />
 
-    <AuthenticatedLayout>
-        <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('Available Courses') }}
-            </h2>
-        </template>
+    <PublicLayout>
+        <div class="py-5 bg-light" style="min-height: 80vh;">
+            <div class="container py-lg-5">
+                <div class="text-center mb-5">
+                    <h2 class="fw-bold text-dark display-5">{{ __('Available Courses') }}</h2>
+                    <p class="text-muted lead">{{ __('Discover the perfect path for your regenerative journey.') }}</p>
+                </div>
 
-        <div class="py-12">
-            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="row g-4">
                     <div v-for="course in courses" :key="course.id" class="col-md-6 col-lg-4">
                         <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden hover-smart transition-all bg-white">
@@ -141,7 +145,7 @@ const enroll = (batchId) => {
                 </div>
             </div>
         </div>
-    </AuthenticatedLayout>
+    </PublicLayout>
 </template>
 
 <script>
@@ -261,6 +265,7 @@ export default {
 .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }

@@ -130,9 +130,9 @@ const deleteCourse = (course) => {
                     <div class="card-header bg-transparent border-bottom py-3">
                         <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
                             <h3 class="card-title fw-bold text-dark mb-0 d-flex align-items-center gap-2">
-                                <i class="bi bi-journal-bookmark-fill text-success"></i>{{ __('Course Catalog') }}
+                                <i class="bi bi-journal-bookmark-fill text-success"></i>{{ $page.props.auth.user.roles.includes('student') ? __('Available Organization Courses') : __('Course Management') }}
                             </h3>
-                            <Link :href="route('courses.create')" class="btn btn-success btn-sm rounded-1 px-4 shadow-sm fw-bold">
+                            <Link v-if="!$page.props.auth.user.roles.includes('student')" :href="route('courses.create')" class="btn btn-success btn-sm rounded-1 px-4 shadow-sm fw-bold">
                                 <i class="bi bi-plus-circle me-2"></i>{{ __('Create Course') }}
                             </Link>
                         </div>
@@ -184,7 +184,7 @@ const deleteCourse = (course) => {
                                         <th class="py-2">{{ __('Level') }}</th>
                                         <th class="py-2">{{ __('Mode') }}</th>
                                         <th class="py-2 text-center">{{ __('Status') }}</th>
-                                        <th class="text-center py-2" style="width: 120px;">{{ __('Actions') }}</th>
+                                        <th v-if="!$page.props.auth.user.roles.includes('student')" class="text-center py-2" style="width: 120px;">{{ __('Actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -234,7 +234,7 @@ const deleteCourse = (course) => {
                                                 <i class="bi bi-x-circle-fill me-1"></i>{{ __('Draft') }}
                                             </span>
                                         </td>
-                                        <td class="text-center">
+                                        <td v-if="!$page.props.auth.user.roles.includes('student')" class="text-center">
                                             <div class="d-flex justify-content-center gap-1">
                                                 <Link :href="route('courses.edit', course.id)" class="btn btn-outline-primary btn-xs rounded-1 p-1 px-2" :title="__('Edit')">
                                                     <i class="bi bi-pencil-square"></i>

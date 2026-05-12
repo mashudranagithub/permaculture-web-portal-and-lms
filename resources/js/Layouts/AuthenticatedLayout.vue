@@ -69,7 +69,7 @@ watch(() => page.props.flash, (flash) => {
 </script>
 
 <template>
-    <div class="app-wrapper" :class="{ 'sidebar-collapse': isSidebarCollapsed, 'sidebar-open': !isSidebarCollapsed, 'sidebar-mini': true }">
+    <div class="app-wrapper" :class="{ 'sidebar-collapse': isSidebarCollapsed || !$page.props.auth.user, 'sidebar-open': !isSidebarCollapsed && $page.props.auth.user, 'sidebar-mini': true, 'no-sidebar': !$page.props.auth.user }">
         <!-- Header Navbar -->
         <nav class="app-header navbar navbar-expand bg-white border-bottom shadow-sm">
             <div class="container-fluid">
@@ -95,7 +95,7 @@ watch(() => page.props.flash, (flash) => {
                         </div>
                     </li>
 
-                    <li class="nav-item dropdown user-menu">
+                    <li v-if="$page.props.auth.user" class="nav-item dropdown user-menu">
                         <a href="#" class="nav-link dropdown-toggle d-flex align-items-center gap-2" data-bs-toggle="dropdown">
                             <img :src="$page.props.auth.user.avatar_url" class="user-image rounded-circle shadow border border-success-subtle object-fit-cover" style="width: 32px; height: 32px;" alt="User Image">
                             <span class="d-none d-md-inline fw-semibold text-dark">{{ $page.props.auth.user.name }}</span>
@@ -112,6 +112,10 @@ watch(() => page.props.flash, (flash) => {
                             </li>
                         </ul>
                     </li>
+                    <li v-else class="nav-item d-flex gap-2">
+                        <Link :href="route('login')" class="btn btn-outline-success btn-sm rounded-pill px-3 fw-bold">{{ __('Login') }}</Link>
+                        <Link :href="route('register')" class="btn btn-success btn-sm rounded-pill px-3 fw-bold text-white shadow-sm">{{ __('Join Now') }}</Link>
+                    </li>
                 </ul>
             </div>
         </nav>
@@ -120,7 +124,7 @@ watch(() => page.props.flash, (flash) => {
         <aside class="app-sidebar bg-dark shadow" data-bs-theme="dark">
             <div class="sidebar-brand bg-success py-2">
                 <Link :href="route('dashboard')" class="brand-link text-decoration-none d-flex align-items-center justify-content-center w-100 px-2">
-                    <template v-if="$page.props.auth.user.organization">
+                    <template v-if="$page.props.auth.user && $page.props.auth.user.organization">
                         <div class="d-flex align-items-center w-100 overflow-hidden">
                             <img :src="$page.props.auth.user.organization.logo_url" alt="Org Logo" 
                                 class="shadow-sm me-2 bg-white p-1 rounded" 
@@ -138,7 +142,7 @@ watch(() => page.props.flash, (flash) => {
                     </template>
                 </Link>
             </div>
-            <div class="sidebar-wrapper scrollbar-simple">
+            <div v-if="$page.props.auth.user" class="sidebar-wrapper scrollbar-simple">
                 <nav class="mt-2">
                     <ul class="nav sidebar-menu flex-column" data-accordion="false">
                         <!-- Dashboard -->
@@ -149,41 +153,55 @@ watch(() => page.props.flash, (flash) => {
                             </Link>
                         </li>
 
-                        <!-- Education Section -->
-                        <li class="nav-header text-uppercase small text-white-50 mt-3">{{ __('Education') }}</li>
-                        <li class="nav-item">
-                            <Link :href="route('courses.index')" class="nav-link" :class="{ 'active': route().current('courses.*') }">
+                        <!-- Education Section (Admin Only) -->
+                        <li v-if="!$page.props.auth.user.roles.includes('student')" class="nav-header text-uppercase small text-white-50 mt-3">{{ __('Management') }}</li>
+                        <li v-if="!$page.props.auth.user.roles.includes('student')" class="nav-item">
+                            <Link :href="route('courses.index')" class="nav-link" :class="{ 'active': route().current('courses.index') || route().current('courses.edit') || route().current('courses.create') }">
                                 <i class="nav-icon bi bi-journal-bookmark-fill"></i>
-                                <p>{{ __('Courses') }}</p>
+                                <p>{{ __('Manage Courses') }}</p>
                             </Link>
                         </li>
-                        <li class="nav-item">
+                        <li v-if="!$page.props.auth.user.roles.includes('student')" class="nav-item">
                             <Link :href="route('batches.index')" class="nav-link" :class="{ 'active': route().current('batches.*') }">
                                 <i class="nav-icon bi bi-collection-fill"></i>
-                                <p>{{ __('Batches') }}</p>
+                                <p>{{ __('Manage Batches') }}</p>
+                            </Link>
+                        </li>
+                        <li v-if="!$page.props.auth.user.roles.includes('student')" class="nav-item">
+                            <Link :href="route('admin.students.index')" class="nav-link" :class="{ 'active': route().current('admin.students.*') }">
+                                <i class="nav-icon bi bi-people-fill"></i>
+                                <p>{{ __('Manage Students') }}</p>
+                            </Link>
+                        </li>
+                        <li v-if="!$page.props.auth.user.roles.includes('student')" class="nav-item">
+                            <Link :href="route('admin.certificates.index')" class="nav-link" :class="{ 'active': route().current('admin.certificates.*') }">
+                                <i class="nav-icon bi bi-patch-check-fill"></i>
+                                <p>{{ __('Manage Certificates') }}</p>
                             </Link>
                         </li>
 
                         <!-- Student Section -->
-                        <li class="nav-header text-uppercase small text-white-50 mt-3">{{ __('Student') }}</li>
-                        <li class="nav-item">
-                            <Link :href="route('enrollments.my-courses')" class="nav-link" :class="{ 'active': route().current('enrollments.my-courses') }">
-                                <i class="nav-icon bi bi-display"></i>
-                                <p>{{ __('My Learning') }}</p>
-                            </Link>
-                        </li>
-                        <li class="nav-item">
-                            <Link :href="route('student.certificates')" class="nav-link" :class="{ 'active': route().current('student.certificates') }">
-                                <i class="nav-icon bi bi-patch-check"></i>
-                                <p>{{ __('My Certificates') }}</p>
-                            </Link>
-                        </li>
-                        <li class="nav-item">
-                            <Link :href="route('courses.browse')" class="nav-link" :class="{ 'active': route().current('courses.browse') }">
-                                <i class="nav-icon bi bi-search"></i>
-                                <p>{{ __('Browse Catalog') }}</p>
-                            </Link>
-                        </li>
+                        <template v-if="$page.props.auth.user.roles.includes('student')">
+                            <li class="nav-header text-uppercase small text-white-50 mt-3">{{ __('Learning') }}</li>
+                            <li class="nav-item">
+                                <Link :href="route('courses.index')" class="nav-link" :class="{ 'active': route().current('courses.index') }">
+                                    <i class="nav-icon bi bi-grid-fill"></i>
+                                    <p>{{ __('Organization Courses') }}</p>
+                                </Link>
+                            </li>
+                            <li class="nav-item">
+                                <Link :href="route('enrollments.my-courses')" class="nav-link" :class="{ 'active': route().current('enrollments.my-courses') }">
+                                    <i class="nav-icon bi bi-display"></i>
+                                    <p>{{ __('My Learning') }}</p>
+                                </Link>
+                            </li>
+                            <li class="nav-item">
+                                <Link :href="route('student.certificates')" class="nav-link" :class="{ 'active': route().current('student.certificates') }">
+                                    <i class="nav-icon bi bi-patch-check"></i>
+                                    <p>{{ __('My Certificates') }}</p>
+                                </Link>
+                            </li>
+                        </template>
 
                         <!-- Organizations (LMS Admin only) -->
                         <li v-if="$page.props.auth.user.roles.includes('super-admin')" class="nav-header text-uppercase small text-white-50 mt-3">{{ __('Organizations') }}</li>
@@ -255,20 +273,6 @@ watch(() => page.props.flash, (flash) => {
                             </Link>
                         </li>
 
-                        <!-- Admin Management -->
-                        <li v-if="!$page.props.auth.user.roles.includes('student')" class="nav-header text-uppercase small text-white-50 mt-3">{{ __('Management') }}</li>
-                        <li v-if="!$page.props.auth.user.roles.includes('student')" class="nav-item">
-                            <Link :href="route('admin.students.index')" class="nav-link" :class="{ 'active': route().current('admin.students.index') }">
-                                <i class="nav-icon bi bi-people-fill"></i>
-                                <p>{{ __('Students') }}</p>
-                            </Link>
-                        </li>
-                        <li v-if="!$page.props.auth.user.roles.includes('student')" class="nav-item">
-                            <Link :href="route('admin.certificates.index')" class="nav-link" :class="{ 'active': route().current('admin.certificates.index') }">
-                                <i class="nav-icon bi bi-patch-check-fill"></i>
-                                <p>{{ __('Certificates') }}</p>
-                            </Link>
-                        </li>
 
                     </ul>
                 </nav>
@@ -306,6 +310,16 @@ watch(() => page.props.flash, (flash) => {
 /* Dashboard Font Size Reduction Only */
 .app-wrapper {
     font-size: 0.85rem;
+}
+
+.no-sidebar .app-main {
+    margin-left: 0 !important;
+}
+.no-sidebar .app-sidebar {
+    display: none !important;
+}
+.no-sidebar .app-header {
+    margin-left: 0 !important;
 }
 
 /* Sidebar Active & Hover Styles */

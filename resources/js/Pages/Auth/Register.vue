@@ -1,4 +1,5 @@
 <script setup>
+import { ref } from 'vue';
 import GuestLayout from '@/Layouts/GuestLayout.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 
@@ -7,7 +8,10 @@ const form = useForm({
     email: '',
     password: '',
     password_confirmation: '',
+    batch_id: new URLSearchParams(window.location.search).get('batch_id'),
 });
+
+const showPassword = ref(false);
 
 const submit = () => {
     form.post(route('register'), {
@@ -60,16 +64,21 @@ const submit = () => {
             <!-- Password -->
             <div class="mb-3">
                 <label for="password" class="form-label fw-bold small text-uppercase tracking-wide text-muted">{{ __('Password') }}</label>
-                <input
-                    id="password"
-                    type="password"
-                    class="form-control form-control-lg rounded-3"
-                    v-model="form.password"
-                    required
-                    autocomplete="new-password"
-                    :class="{ 'is-invalid': form.errors.password }"
-                />
-                <div v-if="form.errors.password" class="invalid-feedback">{{ form.errors.password }}</div>
+                <div class="input-group">
+                    <input
+                        id="password"
+                        :type="showPassword ? 'text' : 'password'"
+                        class="form-control form-control-lg rounded-start-3"
+                        v-model="form.password"
+                        required
+                        autocomplete="new-password"
+                        :class="{ 'is-invalid': form.errors.password }"
+                    />
+                    <button @click="showPassword = !showPassword" class="btn btn-outline-secondary border-light-subtle rounded-end-3 px-3" type="button">
+                        <i class="bi" :class="showPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+                    </button>
+                </div>
+                <div v-if="form.errors.password" class="text-danger small mt-1">{{ form.errors.password }}</div>
             </div>
 
             <!-- Confirm Password -->

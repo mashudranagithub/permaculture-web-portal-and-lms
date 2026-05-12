@@ -16,13 +16,36 @@ Route::get('/', function () {
 
 use App\Http\Controllers\CourseController;
 
+Route::get('course-catalog', [CourseController::class, 'browse'])->name('courses.browse');
+
+Route::middleware(['auth', 'approved'])->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Enrollment & Payments (Allow before verification)
+    Route::post('enrollments', [\App\Http\Controllers\EnrollmentController::class, 'store'])->name('enrollments.store');
+    Route::get('payments/initiate', [\App\Http\Controllers\PaymentController::class, 'initiate'])->name('payments.initiate');
+    Route::post('payments/{enrollment}/mock-success', [\App\Http\Controllers\PaymentController::class, 'mockSuccess'])->name('payments.mock-success');
+
+    // bKash Routes
+    Route::post('bkash/pay/{enrollment}', [\App\Http\Controllers\BkashController::class, 'pay'])->name('bkash.pay');
+    Route::get('bkash/callback', [\App\Http\Controllers\BkashController::class, 'callback'])->name('bkash.callback');
+
+    // SSLCommerz Routes
+    Route::post('sslcommerz/pay/{enrollment}', [\App\Http\Controllers\SSLCommerzController::class, 'pay'])->name('sslcommerz.pay');
+    Route::post('sslcommerz/success', [\App\Http\Controllers\SSLCommerzController::class, 'success'])->name('sslcommerz.success');
+    Route::post('sslcommerz/fail', [\App\Http\Controllers\SSLCommerzController::class, 'fail'])->name('sslcommerz.fail');
+    Route::post('sslcommerz/cancel', [\App\Http\Controllers\SSLCommerzController::class, 'cancel'])->name('sslcommerz.cancel');
+    Route::post('sslcommerz/ipn', [\App\Http\Controllers\SSLCommerzController::class, 'ipn'])->name('sslcommerz.ipn');
+});
+
 Route::middleware(['auth', 'verified', 'approved'])->group(function () {
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
 
     Route::resource('courses', CourseController::class);
-    Route::get('course-catalog', [CourseController::class, 'browse'])->name('courses.browse');
     Route::get('courses/{course}/curriculum', [CourseController::class, 'curriculum'])->name('courses.curriculum');
     
     Route::resource('batches', \App\Http\Controllers\BatchController::class);
@@ -72,28 +95,10 @@ Route::middleware(['auth', 'verified', 'approved'])->group(function () {
         });
     });
 
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
-    // Enrollment & Payments
-    Route::post('enrollments', [\App\Http\Controllers\EnrollmentController::class, 'store'])->name('enrollments.store');
+    // Student Learning & Courses
     Route::get('my-courses', [\App\Http\Controllers\EnrollmentController::class, 'myCourses'])->name('enrollments.my-courses');
     Route::get('courses/{course}/learn', [\App\Http\Controllers\EnrollmentController::class, 'learn'])->name('enrollments.learn');
     Route::post('topics/{topic}/complete', [\App\Http\Controllers\EnrollmentController::class, 'completeTopic'])->name('topics.complete');
-    Route::get('payments/initiate', [\App\Http\Controllers\PaymentController::class, 'initiate'])->name('payments.initiate');
-    Route::post('payments/{enrollment}/mock-success', [\App\Http\Controllers\PaymentController::class, 'mockSuccess'])->name('payments.mock-success');
-
-    // bKash Routes
-    Route::post('bkash/pay/{enrollment}', [\App\Http\Controllers\BkashController::class, 'pay'])->name('bkash.pay');
-    Route::get('bkash/callback', [\App\Http\Controllers\BkashController::class, 'callback'])->name('bkash.callback');
-
-    // SSLCommerz Routes
-    Route::post('sslcommerz/pay/{enrollment}', [\App\Http\Controllers\SSLCommerzController::class, 'pay'])->name('sslcommerz.pay');
-    Route::post('sslcommerz/success', [\App\Http\Controllers\SSLCommerzController::class, 'success'])->name('sslcommerz.success');
-    Route::post('sslcommerz/fail', [\App\Http\Controllers\SSLCommerzController::class, 'fail'])->name('sslcommerz.fail');
-    Route::post('sslcommerz/cancel', [\App\Http\Controllers\SSLCommerzController::class, 'cancel'])->name('sslcommerz.cancel');
-    Route::post('sslcommerz/ipn', [\App\Http\Controllers\SSLCommerzController::class, 'ipn'])->name('sslcommerz.ipn');
 
     // Media Uploads
     Route::post('/media/upload', [\App\Http\Controllers\MediaController::class, 'upload'])->name('media.upload');
@@ -104,6 +109,7 @@ Route::middleware(['auth', 'verified', 'approved'])->group(function () {
 
     // Students (Organization View)
     Route::get('students', [\App\Http\Controllers\Admin\StudentListController::class, 'index'])->name('admin.students.index');
+    Route::post('students', [\App\Http\Controllers\Admin\StudentListController::class, 'store'])->name('admin.students.store');
     Route::get('students/{user}', [\App\Http\Controllers\Admin\StudentListController::class, 'show'])->name('admin.students.show');
 
     // Student Specific
