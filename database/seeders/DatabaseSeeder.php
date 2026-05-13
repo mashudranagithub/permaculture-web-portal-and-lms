@@ -50,7 +50,7 @@ class DatabaseSeeder extends Seeder
             ['email' => 'mashudtech@gmail.com'],
             [
                 'name' => 'Mashud Rana',
-                'password' => Hash::make('password123'), // You should change this!
+                'password' => Hash::make('password'),
                 'email_verified_at' => now(),
                 'is_approved' => true,
             ]
