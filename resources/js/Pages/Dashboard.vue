@@ -23,64 +23,72 @@ import { Head, Link } from '@inertiajs/vue3';
 
         <div class="row g-4">
             <!-- Small Box for Students -->
-            <div class="col-lg-3 col-6">
-                <div class="small-box bg-primary shadow-sm text-white p-3 rounded-3 position-relative overflow-hidden">
-                    <div class="inner">
-                        <h3 class="fw-bold mb-0">1,250</h3>
-                        <p class="mb-0">{{ __('Total Students') }}</p>
+            <div class="col-lg-3 col-sm-6">
+                <div class="card border-0 shadow-sm text-white bg-primary p-4 rounded-3 h-100 position-relative overflow-hidden">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <h3 class="fw-bold mb-1 fs-3">1,250</h3>
+                            <p class="mb-0 small opacity-75 fw-semibold">{{ __('Total Students') }}</p>
+                        </div>
+                        <div class="bg-white bg-opacity-25 rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; min-width: 48px;">
+                            <i class="bi bi-people-fill fs-3 text-white"></i>
+                        </div>
                     </div>
-                    <div class="icon position-absolute top-0 end-0 p-3 opacity-25">
-                        <i class="bi bi-people-fill fs-1"></i>
-                    </div>
-                    <a href="#" class="small-box-footer text-white-50 text-decoration-none d-block mt-3 small">
+                    <a href="#" class="text-white text-decoration-none mt-3 small d-flex align-items-center gap-1 opacity-75 hover-opacity-100 pt-2 border-top border-white border-opacity-10">
                         {{ __('More info') }} <i class="bi bi-arrow-right-circle-fill"></i>
                     </a>
                 </div>
             </div>
 
             <!-- Small Box for Courses -->
-            <div class="col-lg-3 col-6">
-                <div class="small-box bg-success shadow-sm text-white p-3 rounded-3 position-relative overflow-hidden">
-                    <div class="inner">
-                        <h3 class="fw-bold mb-0">24</h3>
-                        <p class="mb-0">{{ __('Active Courses') }}</p>
+            <div class="col-lg-3 col-sm-6">
+                <div class="card border-0 shadow-sm text-white bg-success p-4 rounded-3 h-100 position-relative overflow-hidden">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <h3 class="fw-bold mb-1 fs-3">24</h3>
+                            <p class="mb-0 small opacity-75 fw-semibold">{{ __('Active Courses') }}</p>
+                        </div>
+                        <div class="bg-white bg-opacity-25 rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; min-width: 48px;">
+                            <i class="bi bi-journal-check fs-3 text-white"></i>
+                        </div>
                     </div>
-                    <div class="icon position-absolute top-0 end-0 p-3 opacity-25">
-                        <i class="bi bi-journal-check fs-1"></i>
-                    </div>
-                    <a href="#" class="small-box-footer text-white-50 text-decoration-none d-block mt-3 small">
+                    <a href="#" class="text-white text-decoration-none mt-3 small d-flex align-items-center gap-1 opacity-75 hover-opacity-100 pt-2 border-top border-white border-opacity-10">
                         {{ __('More info') }} <i class="bi bi-arrow-right-circle-fill"></i>
                     </a>
                 </div>
             </div>
 
             <!-- Small Box for Revenue -->
-            <div class="col-lg-3 col-6">
-                <div class="small-box bg-warning shadow-sm text-dark p-3 rounded-3 position-relative overflow-hidden">
-                    <div class="inner">
-                        <h3 class="fw-bold mb-0">৳ 45,200</h3>
-                        <p class="mb-0">{{ __('Monthly Revenue') }}</p>
+            <div class="col-lg-3 col-sm-6">
+                <div class="card border-0 shadow-sm text-dark bg-warning p-4 rounded-3 h-100 position-relative overflow-hidden">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <h3 class="fw-bold mb-1 fs-3 text-nowrap">৳ 45,200</h3>
+                            <p class="mb-0 small opacity-75 fw-semibold text-muted">{{ __('Monthly Revenue') }}</p>
+                        </div>
+                        <div class="bg-dark bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; min-width: 48px;">
+                            <i class="bi bi-cash-stack fs-3 text-dark"></i>
+                        </div>
                     </div>
-                    <div class="icon position-absolute top-0 end-0 p-3 opacity-25 text-dark">
-                        <i class="bi bi-cash-stack fs-1"></i>
-                    </div>
-                    <a href="#" class="small-box-footer text-dark-50 text-decoration-none d-block mt-3 small">
+                    <a href="#" class="text-dark text-decoration-none mt-3 small d-flex align-items-center gap-1 opacity-75 hover-opacity-100 pt-2 border-top border-dark border-opacity-10">
                         {{ __('More info') }} <i class="bi bi-arrow-right-circle-fill"></i>
                     </a>
                 </div>
             </div>
 
             <!-- Small Box for Projects -->
-            <div class="col-lg-3 col-6">
-                <div class="small-box bg-danger shadow-sm text-white p-3 rounded-3 position-relative overflow-hidden">
-                    <div class="inner">
-                        <h3 class="fw-bold mb-0">85%</h3>
-                        <p class="mb-0">{{ __('Project Growth') }}</p>
+            <div class="col-lg-3 col-sm-6">
+                <div class="card border-0 shadow-sm text-white bg-danger p-4 rounded-3 h-100 position-relative overflow-hidden">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <h3 class="fw-bold mb-1 fs-3">85%</h3>
+                            <p class="mb-0 small opacity-75 fw-semibold">{{ __('Project Growth') }}</p>
+                        </div>
+                        <div class="bg-white bg-opacity-25 rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; min-width: 48px;">
+                            <i class="bi bi-graph-up-arrow fs-3 text-white"></i>
+                        </div>
                     </div>
-                    <div class="icon position-absolute top-0 end-0 p-3 opacity-25">
-                        <i class="bi bi-graph-up-arrow fs-1"></i>
-                    </div>
-                    <a href="#" class="small-box-footer text-white-50 text-decoration-none d-block mt-3 small">
+                    <a href="#" class="text-white text-decoration-none mt-3 small d-flex align-items-center gap-1 opacity-75 hover-opacity-100 pt-2 border-top border-white border-opacity-10">
                         {{ __('More info') }} <i class="bi bi-arrow-right-circle-fill"></i>
                     </a>
                 </div>
@@ -111,7 +119,7 @@ import { Head, Link } from '@inertiajs/vue3';
                                             <div class="fw-bold">Tanvir Ahmed</div>
                                             <div class="small text-muted">Dhaka, BD</div>
                                         </td>
-                                        <td>Urban Permaculture</td>
+                                        <td>Urban Regenerative Systems</td>
                                         <td><span class="badge bg-success rounded-pill px-3">{{ __('Paid') }}</span></td>
                                     </tr>
                                     <tr>

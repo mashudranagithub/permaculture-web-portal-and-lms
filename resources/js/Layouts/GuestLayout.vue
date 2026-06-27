@@ -10,7 +10,7 @@ const props = defineProps({
         <div class="mb-4">
             <Link href="/" class="text-decoration-none d-flex flex-column align-items-center">
                 <img src="/favicon.png" alt="Logo" class="rounded-circle shadow-lg" style="width: 80px; height: 80px; object-fit: cover; border: 3px solid #fff;">
-                <h4 class="mt-3 fw-bold text-success text-uppercase tracking-wider font-outfit">{{ __('Permaculture Methods') }}</h4>
+                <h4 class="mt-3 fw-bold text-success text-uppercase tracking-wider font-outfit">{{ __('Regenerative Systems') }}</h4>
             </Link>
         </div>
 
@@ -21,7 +21,7 @@ const props = defineProps({
         </div>
         
         <div class="mt-4 text-center">
-            <p class="text-muted small">&copy; 2026 Permaculture Methods. {{ __('Rooted in Earth Care.') }}</p>
+            <p class="text-muted small">&copy; 2026 Regenerative Systems. {{ __('Rooted in Earth Care.') }}</p>
         </div>
     </div>
 </template>

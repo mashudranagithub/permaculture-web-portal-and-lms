@@ -19,7 +19,7 @@ class MasterOrganizationSeeder extends Seeder
         $masterOrg = Organization::firstOrCreate(
             ['slug' => 'permaculture-main'],
             [
-                'name' => 'Permaculture Main',
+                'name' => 'Regenerative Systems Main',
                 'email' => 'admin@permaculture.test',
                 'status' => 'active',
                 'approved_at' => now(),

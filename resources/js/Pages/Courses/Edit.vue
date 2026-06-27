@@ -122,7 +122,7 @@ const submit = () => {
                                             <div v-show="activeTab === 'bn'" class="animate__animated animate__fadeIn">
                                                 <div class="mb-4">
                                                     <label class="form-label small fw-bold text-dark">{{ __('Course Title (Bangla)') }}</label>
-                                                    <input v-model="form.title.bn" type="text" class="form-control standard-height border-2 shadow-none rounded-2" placeholder="উদাঃ পারমাকালচার ডিজাইন সার্টিফিকেট" required>
+                                                    <input v-model="form.title.bn" type="text" class="form-control standard-height border-2 shadow-none rounded-2" placeholder="উদাঃ রিজেনারেটিভ সিস্টেমস ডিজাইন সার্টিফিকেট" required>
                                                     <div v-if="form.errors['title.bn']" class="text-danger small mt-1">{{ form.errors['title.bn'] }}</div>
                                                 </div>
                                                 <div class="mb-4">
@@ -141,7 +141,7 @@ const submit = () => {
                                             <div v-show="activeTab === 'en'" class="animate__animated animate__fadeIn">
                                                 <div class="mb-4">
                                                     <label class="form-label small fw-bold text-dark">{{ __('Course Title (English)') }}</label>
-                                                    <input v-model="form.title.en" type="text" class="form-control standard-height border-2 shadow-none rounded-2" :placeholder="__('e.g. Permaculture Design Certificate')" required>
+                                                    <input v-model="form.title.en" type="text" class="form-control standard-height border-2 shadow-none rounded-2" :placeholder="__('e.g. Regenerative Systems Design Certificate')" required>
                                                     <div v-if="form.errors['title.en']" class="text-danger small mt-1">{{ form.errors['title.en'] }}</div>
                                                 </div>
                                                 <div class="mb-4">

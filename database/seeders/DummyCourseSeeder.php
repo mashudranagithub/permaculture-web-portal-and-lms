@@ -29,12 +29,12 @@ class DummyCourseSeeder extends Seeder
             [
                 'organization_id' => $org->id,
                 'title' => [
-                    'en' => 'Introduction to Permaculture Design',
-                    'bn' => 'পারমাকালচার ডিজাইনের পরিচিতি'
+                    'en' => 'Introduction to Regenerative Systems Design',
+                    'bn' => 'রিজেনারেটিভ সিস্টেমস ডিজাইনের পরিচিতি'
                 ],
                 'description' => [
-                    'en' => 'Learn the core principles of permaculture design and how to apply them to your own land or community.',
-                    'bn' => 'পারমাকালচার ডিজাইনের মূল নীতিগুলো এবং কীভাবে আপনার নিজের জমি বা সম্প্রদায়ে সেগুলো প্রয়োগ করবেন তা শিখুন।'
+                    'en' => 'Learn the core principles of regenerative systems design and how to apply them to your own land or community.',
+                    'bn' => 'রিজেনারেটিভ সিস্টেমস ডিজাইনের মূল নীতিগুলো এবং কীভাবে আপনার নিজের জমি বা সম্প্রদায়ে সেগুলো প্রয়োগ করবেন তা শিখুন।'
                 ],
                 'short_description' => [
                     'en' => 'A comprehensive guide to regenerative living and ecological design.',

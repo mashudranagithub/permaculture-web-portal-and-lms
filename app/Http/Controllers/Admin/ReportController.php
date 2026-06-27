@@ -26,7 +26,7 @@ class ReportController extends Controller
         ]);
 
         $mpdf->SetTitle($filename);
-        $mpdf->SetAuthor('Permaculture');
+        $mpdf->SetAuthor('Regenerative Systems');
         $mpdf->WriteHTML($html);
         return $mpdf->Output($filename . '.pdf', 'D'); // 'D' forces download
     }

@@ -30,7 +30,7 @@ const submit = () => {
 
         <div class="text-center mb-4">
             <h2 class="fw-bold text-dark">{{ __('Log in') }}</h2>
-            <p class="text-muted small">{{ __('Welcome back to Permaculture Methods') }}</p>
+            <p class="text-muted small">{{ __('Welcome back to Regenerative Systems') }}</p>
         </div>
 
         <div v-if="status" class="alert alert-success mb-4 text-sm fw-medium">

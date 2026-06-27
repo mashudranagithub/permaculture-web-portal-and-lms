@@ -17,7 +17,7 @@ class CourseBatchSeeder extends Seeder
 
         $courses = [
             [
-                'title' => ['en' => 'Permaculture Design Course (PDC)', 'bn' => 'পারমাকালচার ডিজাইন কোর্স (পিডিসি)'],
+                'title' => ['en' => 'Regenerative Systems Design Course (PDC)', 'bn' => 'রিজেনারেটিভ সিস্টেমস ডিজাইন কোর্স (পিডিসি)'],
                 'description' => ['en' => 'Full PDC certification course.', 'bn' => 'সম্পূর্ণ পিডিসি সার্টিফিকেট কোর্স।'],
                 'short_description' => ['en' => 'Intro to PDC.', 'bn' => 'পিডিসি পরিচিতি।'],
                 'price' => 5000,

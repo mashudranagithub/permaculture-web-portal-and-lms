@@ -57,7 +57,7 @@
         </table>
 
         <div style="margin-top: 20px; font-size: 8px; color: #aaa; font-family: sans-serif;">
-            Verified Digital Credential • Permaculture LMS Excellence
+            Verified Digital Credential • Regenerative Systems LMS Excellence
         </div>
     </div>
 

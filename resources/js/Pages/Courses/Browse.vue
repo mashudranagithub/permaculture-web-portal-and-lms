@@ -1,9 +1,11 @@
 <script setup>
 import PublicLayout from '@/Layouts/PublicLayout.vue';
+import PageHeader from '@/Components/PageHeader.vue';
 import { Head, Link, useForm, usePage, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
-const props = defineProps({
+defineProps({
+    header: Object,
     courses: Array
 });
 
@@ -31,12 +33,15 @@ const enroll = (batchId) => {
     <Head :title="__('Browse Courses')" />
 
     <PublicLayout>
+        <PageHeader 
+            :title="header.title" 
+            :subtitle="header.subtitle" 
+            :badge="header.badge" 
+            :bg-image="header.bg_image" 
+        />
+
         <div class="py-5 bg-light" style="min-height: 80vh;">
             <div class="container py-lg-5">
-                <div class="text-center mb-5">
-                    <h2 class="fw-bold text-dark display-5">{{ __('Available Courses') }}</h2>
-                    <p class="text-muted lead">{{ __('Discover the perfect path for your regenerative journey.') }}</p>
-                </div>
 
                 <div class="row g-4">
                     <div v-for="course in courses" :key="course.id" class="col-md-6 col-lg-4">

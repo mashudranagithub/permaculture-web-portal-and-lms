@@ -97,7 +97,7 @@ const exportData = async (type) => {
                         ${data.map(row => `<tr>${Object.values(row).map(v => `<td>${v}</td>`).join('')}</tr>`).join('')}
                     </tbody>
                 </table>
-                <div class="footer">Generated via Permaculture ERP Management System</div>
+                <div class="footer">Generated via Regenerative Systems ERP Management System</div>
                 <script>
                     window.onload = function() {
                         setTimeout(function() {

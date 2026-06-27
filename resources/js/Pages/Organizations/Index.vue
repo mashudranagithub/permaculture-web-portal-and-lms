@@ -121,6 +121,10 @@ const deleteOrg = (org) => {
                                             class="btn btn-light btn-sm rounded-circle p-2" title="View Details">
                                             <i class="bx bx-show fs-5"></i>
                                         </Link>
+                                        <Link :href="route('admin.organizations.edit', org.id)" 
+                                            class="btn btn-light btn-sm rounded-circle p-2 text-success" title="Edit">
+                                            <i class="bx bx-edit fs-5"></i>
+                                        </Link>
                                         <button @click="deleteOrg(org)" 
                                             class="btn btn-light btn-sm rounded-circle p-2 text-danger" title="Delete">
                                             <i class="bx bx-trash fs-5"></i>

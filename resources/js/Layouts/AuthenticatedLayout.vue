@@ -205,31 +205,14 @@ watch(() => page.props.flash, (flash) => {
 
                         <!-- Organizations (LMS Admin only) -->
                         <li v-if="$page.props.auth.user.roles.includes('super-admin')" class="nav-header text-uppercase small text-white-50 mt-3">{{ __('Organizations') }}</li>
-                        <li v-if="$page.props.auth.user.roles.includes('super-admin')" class="nav-item" :class="{ 'menu-open': orgMenuOpen }">
-                            <a href="#" class="nav-link" :class="{ 'active': route().current('admin.organizations.*') }" @click.prevent="orgMenuOpen = !orgMenuOpen">
-                                <i class="nav-icon bi bi-buildings-fill"></i>
+                        <li v-if="$page.props.auth.user.roles.includes('super-admin')" class="nav-item">
+                            <Link :href="route('admin.organizations.queue')" class="nav-link" :class="{ 'active': route().current('admin.organizations.queue') }">
+                                <i class="nav-icon bi bi-hourglass-split"></i>
                                 <p>
-                                    {{ __('Organizations') }}
-                                    <i class="nav-arrow bi bi-chevron-right"></i>
+                                    {{ __('Organization Approvals') }}
+                                    <span v-if="$page.props.pendingCount" class="badge bg-warning text-dark ms-auto rounded-pill px-1" style="font-size: 0.65rem;">{{ $page.props.pendingCount }}</span>
                                 </p>
-                            </a>
-                            <ul class="nav nav-treeview" :style="{ display: orgMenuOpen ? 'block' : 'none' }">
-                                <li class="nav-item">
-                                    <Link :href="route('admin.organizations.index')" class="nav-link" :class="{ 'active': route().current('admin.organizations.index') }">
-                                        <i class="nav-icon bi bi-card-list"></i>
-                                        <p>All Organizations</p>
-                                    </Link>
-                                </li>
-                                <li class="nav-item">
-                                    <Link :href="route('admin.organizations.queue')" class="nav-link" :class="{ 'active': route().current('admin.organizations.queue') }">
-                                        <i class="nav-icon bi bi-hourglass-split"></i>
-                                        <p>
-                                            Approval Queue
-                                            <span v-if="$page.props.pendingCount" class="badge bg-warning text-dark ms-auto rounded-pill px-1" style="font-size: 0.65rem;">{{ $page.props.pendingCount }}</span>
-                                        </p>
-                                    </Link>
-                                </li>
-                            </ul>
+                            </Link>
                         </li>
 
                         <!-- ACL Section -->
@@ -270,6 +253,51 @@ watch(() => page.props.flash, (flash) => {
                             <Link :href="route('admin.settings.payment')" class="nav-link" :class="{ 'active': route().current('admin.settings.payment') }">
                                 <i class="nav-icon bi bi-gear-wide-connected"></i>
                                 <p>{{ __('Payment Gateways') }}</p>
+                            </Link>
+                        </li>
+
+                        <!-- Portal CMS (Super / LMS Admin only) -->
+                        <li v-if="$page.props.auth.user.roles.includes('super-admin') || (!$page.props.auth.user.organization && $page.props.auth.user.roles.includes('admin'))" class="nav-header text-uppercase small text-white-50 mt-3">{{ __('Web Portal') }}</li>
+                        <li v-if="$page.props.auth.user.roles.includes('super-admin') || (!$page.props.auth.user.organization && $page.props.auth.user.roles.includes('admin'))" class="nav-item">
+                            <Link :href="route('admin.cms.homepage.edit')" class="nav-link" :class="{ 'active': route().current('admin.cms.homepage.edit') }">
+                                <i class="nav-icon bi bi-house-door"></i>
+                                <p>{{ __('Homepage') }}</p>
+                            </Link>
+                        </li>
+                        <li v-if="$page.props.auth.user.roles.includes('super-admin') || (!$page.props.auth.user.organization && $page.props.auth.user.roles.includes('admin'))" class="nav-item">
+                            <Link :href="route('admin.cms.about.edit')" class="nav-link" :class="{ 'active': route().current('admin.cms.about.edit') }">
+                                <i class="nav-icon bi bi-file-person"></i>
+                                <p>{{ __('About Us') }}</p>
+                            </Link>
+                        </li>
+                        <li v-if="$page.props.auth.user.roles.includes('super-admin') || (!$page.props.auth.user.organization && $page.props.auth.user.roles.includes('admin'))" class="nav-item">
+                            <Link :href="route('admin.cms.terms.edit')" class="nav-link" :class="{ 'active': route().current('admin.cms.terms.edit') }">
+                                <i class="nav-icon bi bi-file-earmark-text"></i>
+                                <p>{{ __('Terms & Conditions') }}</p>
+                            </Link>
+                        </li>
+                        <li v-if="$page.props.auth.user.roles.includes('super-admin') || (!$page.props.auth.user.organization && $page.props.auth.user.roles.includes('admin'))" class="nav-item">
+                            <Link :href="route('admin.cms.privacy.edit')" class="nav-link" :class="{ 'active': route().current('admin.cms.privacy.edit') }">
+                                <i class="nav-icon bi bi-shield-check"></i>
+                                <p>{{ __('Privacy Policy') }}</p>
+                            </Link>
+                        </li>
+                        <li v-if="$page.props.auth.user.roles.includes('super-admin') || (!$page.props.auth.user.organization && $page.props.auth.user.roles.includes('admin'))" class="nav-item">
+                            <Link :href="route('admin.cms.courses-header.edit')" class="nav-link" :class="{ 'active': route().current('admin.cms.courses-header.edit') }">
+                                <i class="nav-icon bi bi-journal-bookmark"></i>
+                                <p>{{ __('Course Catalog Header') }}</p>
+                            </Link>
+                        </li>
+                        <li v-if="$page.props.auth.user.roles.includes('super-admin') || (!$page.props.auth.user.organization && $page.props.auth.user.roles.includes('admin'))" class="nav-item">
+                            <Link :href="route('admin.cms.partners-header.edit')" class="nav-link" :class="{ 'active': route().current('admin.cms.partners-header.edit') }">
+                                <i class="nav-icon bi bi-buildings"></i>
+                                <p>{{ __('Partners Directory Header') }}</p>
+                            </Link>
+                        </li>
+                        <li v-if="$page.props.auth.user.roles.includes('super-admin') || (!$page.props.auth.user.organization && $page.props.auth.user.roles.includes('admin'))" class="nav-item">
+                            <Link :href="route('admin.cms.contact.edit')" class="nav-link" :class="{ 'active': route().current('admin.cms.contact.edit') }">
+                                <i class="nav-icon bi bi-envelope-paper"></i>
+                                <p>{{ __('Contact Us') }}</p>
                             </Link>
                         </li>
 

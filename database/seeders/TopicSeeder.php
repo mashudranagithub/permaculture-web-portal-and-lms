@@ -19,8 +19,8 @@ class TopicSeeder extends Seeder
         foreach ($courses as $course) {
             $topics = [
                 [
-                    'title' => ['en' => 'Principles of Permaculture', 'bn' => 'পারমাকালচারের নীতিমালা'],
-                    'content_body' => ['en' => '<p>Watch this video to understand the 12 principles of permaculture design.</p>', 'bn' => '<p>পারমাকালচার ডিজাইনের ১২টি নীতিমালা বুঝতে এই ভিডিওটি দেখুন।</p>'],
+                    'title' => ['en' => 'Principles of Regenerative Systems', 'bn' => 'রিজেনারেটিভ সিস্টেমসের নীতিমালা'],
+                    'content_body' => ['en' => '<p>Watch this video to understand the 12 principles of regenerative systems design.</p>', 'bn' => '<p>রিজেনারেটিভ সিস্টেমস ডিজাইনের ১২টি নীতিমালা বুঝতে এই ভিডিওটি দেখুন।</p>'],
                     'topic_type' => 'video',
                     'video_url' => 'https://www.youtube.com/watch?v=YRSn-DZTGa4',
                     'order_index' => 1,
@@ -49,7 +49,7 @@ class TopicSeeder extends Seeder
                     'topic_type' => 'quiz',
                     'quiz_data' => [
                         [
-                            'question' => ['en' => 'What is Permaculture?', 'bn' => 'পারমাকালচার কি?'],
+                            'question' => ['en' => 'What is Regenerative Systems?', 'bn' => 'রিজেনারেটিভ সিস্টেমস কি?'],
                             'type' => 'mcq',
                             'options' => [
                                 ['en' => 'A way of gardening', 'bn' => 'বাগান করার একটি পদ্ধতি'],
@@ -60,7 +60,7 @@ class TopicSeeder extends Seeder
                             'points' => 10,
                         ],
                         [
-                            'question' => ['en' => 'Permaculture only applies to farms.', 'bn' => 'পারমাকালচার কেবল খামারে প্রযোজ্য।'],
+                            'question' => ['en' => 'Regenerative Systems only applies to farms.', 'bn' => 'রিজেনারেটিভ সিস্টেমস কেবল খামারে প্রযোজ্য।'],
                             'type' => 'true_false',
                             'correct_answer' => 1, // False
                             'points' => 5,

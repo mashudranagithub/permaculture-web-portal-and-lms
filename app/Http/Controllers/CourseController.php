@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use App\Models\Course;
 use App\Models\Enrollment;
+use App\Models\PortalSetting;
 use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Http\RedirectResponse;
@@ -267,7 +268,25 @@ class CourseController extends Controller
                 ];
             });
 
+        $coursesHeader = PortalSetting::getValue('courses_header', [
+            'title' => ['en' => 'Available Courses', 'bn' => 'প্রাপ্য কোর্সসমূহ'],
+            'subtitle' => ['en' => 'Discover the perfect path for your regenerative journey.', 'bn' => 'আপনার পুনরুত্পাদনশীল যাত্রার জন্য নিখুঁত পথটি আবিষ্কার করুন।'],
+            'badge' => ['en' => 'Interactive Learning', 'bn' => 'ইন্টারেক্টিভ লার্নিং'],
+            'bg_image' => 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=1920&q=80'
+        ]);
+        $locale = app()->getLocale();
+        $header = [
+            'title' => $coursesHeader['title'][$locale] ?? $coursesHeader['title']['en'] ?? '',
+            'subtitle' => $coursesHeader['subtitle'][$locale] ?? $coursesHeader['subtitle']['en'] ?? '',
+            'badge' => $coursesHeader['badge'][$locale] ?? $coursesHeader['badge']['en'] ?? '',
+            'bg_image' => $coursesHeader['bg_image'] ?? 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=1920&q=80',
+        ];
+        if ($header['bg_image'] && !str_starts_with($header['bg_image'], 'http')) {
+            $header['bg_image'] = asset('storage/' . $header['bg_image']);
+        }
+
         return Inertia::render('Courses/Browse', [
+            'header' => $header,
             'courses' => $courses
         ]);
     }

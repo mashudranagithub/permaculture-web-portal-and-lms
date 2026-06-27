@@ -208,9 +208,9 @@ const rejectOrg = async () => {
                             <input class="form-check-input" type="checkbox" role="switch" id="showInDirectory" checked disabled>
                             <label class="form-check-label small" for="showInDirectory">Show in Directory</label>
                         </div>
-                        <button class="btn btn-light w-100 rounded-pill btn-sm text-muted mt-2" disabled>
+                        <Link :href="route('admin.organizations.edit', organization.id)" class="btn btn-outline-success w-100 rounded-pill btn-sm mt-2">
                             <i class="bx bx-cog me-1"></i> Edit Organization Info
-                        </button>
+                        </Link>
                     </div>
 
                     <div v-if="organization.rejection_reason" class="card border-0 shadow-sm rounded-4 p-4 border-start border-4 border-danger">

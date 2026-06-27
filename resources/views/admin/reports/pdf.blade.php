@@ -65,7 +65,7 @@
 </head>
 <body>
     <div class="header">
-        <h1>Permaculture Management System</h1>
+        <h1>Regenerative Systems Management System</h1>
         <p>{{ $title }}</p>
     </div>
 
@@ -94,7 +94,7 @@
     </table>
 
     <div class="footer">
-        © {{ date('Y') }} Permaculture ERP. This is a computer-generated document.
+        © {{ date('Y') }} Regenerative Systems ERP. This is a computer-generated document.
     </div>
 </body>
 </html>

@@ -92,7 +92,7 @@ const exportData = (type) => {
                         ${data.map(row => `<tr>${Object.values(row).map(v => `<td>${v}</td>`).join('')}</tr>`).join('')}
                     </tbody>
                 </table>
-                <div class="footer">Generated via Permaculture LMS System</div>
+                <div class="footer">Generated via Regenerative Systems LMS System</div>
                 <script>
                     window.onload = function() {
                         setTimeout(function() { window.print(); }, 500);

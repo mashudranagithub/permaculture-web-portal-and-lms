@@ -69,4 +69,70 @@ class SettingsController extends Controller
 
         return back()->with('message', 'Payment settings updated successfully.');
     }
+
+    /**
+     * Show the organization profile edit form.
+     */
+    public function editOrganization()
+    {
+        $user = Auth::user();
+        if (!$user->hasRole(['super-admin', 'admin'])) {
+            abort(403, 'This action is unauthorized.');
+        }
+
+        $organization = $user->organization;
+
+        if (!$organization) {
+            abort(403, 'You do not belong to an organization.');
+        }
+
+        return Inertia::render('Organizations/Edit', [
+            'organization' => $organization,
+            'isSuperAdmin' => false,
+        ]);
+    }
+
+    /**
+     * Update the organization profile.
+     */
+    public function updateOrganization(Request $request)
+    {
+        $user = Auth::user();
+        if (!$user->hasRole(['super-admin', 'admin'])) {
+            abort(403, 'This action is unauthorized.');
+        }
+
+        $organization = $user->organization;
+
+        if (!$organization) {
+            abort(403, 'You do not belong to an organization.');
+        }
+
+        $request->validate([
+            'name'        => 'required|string|max:255',
+            'email'       => 'required|email|unique:organizations,email,' . $organization->id,
+            'phone'       => 'nullable|string|max:30',
+            'website'     => 'nullable|url|max:255',
+            'address'     => 'nullable|string|max:500',
+            'description' => 'nullable|string|max:2000',
+            'logo'        => 'nullable|image|mimes:jpg,jpeg,png,svg|max:2048',
+        ]);
+
+        $data = $request->only(['name', 'email', 'phone', 'website', 'address', 'description']);
+
+        if ($request->hasFile('logo')) {
+            if ($organization->logo) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($organization->logo);
+            }
+            $data['logo'] = $request->file('logo')->store('organizations/logos', 'public');
+        }
+
+        if ($organization->name !== $request->name) {
+            $data['slug'] = \Illuminate\Support\Str::slug($request->name);
+        }
+
+        $organization->update($data);
+
+        return redirect()->back()->with('message', 'Organization profile updated successfully.');
+    }
 }

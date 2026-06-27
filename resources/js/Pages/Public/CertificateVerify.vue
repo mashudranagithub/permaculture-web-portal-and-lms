@@ -17,7 +17,7 @@ const props = defineProps({
                     <i class="bi bi-patch-check-fill text-success fs-1"></i>
                 </div>
                 <h3 class="fw-bold text-dark mb-1">{{ __('Certificate Verified') }}</h3>
-                <p class="text-muted small">{{ __('This document is an authentic certificate issued by Permaculture LMS.') }}</p>
+                <p class="text-muted small">{{ __('This document is an authentic certificate issued by Regenerative Systems LMS.') }}</p>
             </div>
 
             <div class="card border-0 bg-light rounded-4 overflow-hidden mb-4 text-start">

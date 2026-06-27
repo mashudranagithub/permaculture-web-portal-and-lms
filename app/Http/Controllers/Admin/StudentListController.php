@@ -31,8 +31,10 @@ class StudentListController extends Controller
             'password' => Hash::make($request->password),
             'organization_id' => Auth::user()->organization_id,
             'is_approved' => true,
-            'email_verified_at' => now(),
         ]);
+
+        $user->email_verified_at = now();
+        $user->save();
 
         $studentRole = Role::where('slug', 'student')->first();
         if ($studentRole) {

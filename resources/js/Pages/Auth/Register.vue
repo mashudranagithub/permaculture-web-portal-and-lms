@@ -26,7 +26,7 @@ const submit = () => {
 
         <div class="text-center mb-4">
             <h2 class="fw-bold text-dark">{{ __('Sign Up') }}</h2>
-            <p class="text-muted small">{{ __('Join the Permaculture Methods community') }}</p>
+            <p class="text-muted small">{{ __('Join the Regenerative Systems community') }}</p>
         </div>
 
         <form @submit.prevent="submit">

@@ -43,7 +43,7 @@ router.on('finish', () => {
     });
 });
 
-const appName = import.meta.env.VITE_APP_NAME || 'Permaculture';
+const appName = import.meta.env.VITE_APP_NAME || 'Regenerative Systems';
 
 createInertiaApp({
     title: (title) => title ? `${title}` : appName,

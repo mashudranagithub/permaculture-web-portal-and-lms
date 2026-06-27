@@ -50,7 +50,7 @@ const submit = () => {
             <div class="text-center mb-5 animate-up">
                 <Link href="/" class="text-decoration-none">
                     <img src="/favicon.png" alt="Logo" class="rounded-circle shadow-sm mb-3" style="width: 70px; height: 70px; object-fit: cover; border: 3px solid #fff;">
-                    <h2 class="fw-bold text-success text-uppercase tracking-wider fs-4">{{ __('Permaculture Methods') }}</h2>
+                    <h2 class="fw-bold text-success text-uppercase tracking-wider fs-4">{{ __('Regenerative Systems') }}</h2>
                 </Link>
                 <h1 class="display-5 fw-bold text-dark mt-4 mb-2">{{ __('Partner Registration') }}</h1>
                 <p class="text-muted lead">{{ __('Complete the form below to register your academy on our professional platform.') }}</p>
@@ -175,7 +175,7 @@ const submit = () => {
             </div>
             
             <div class="text-center mt-5">
-                <p class="text-muted small">&copy; 2026 Permaculture Methods. {{ __('All Rights Reserved.') }}</p>
+                <p class="text-muted small">&copy; 2026 Regenerative Systems. {{ __('All Rights Reserved.') }}</p>
             </div>
         </div>
     </div>

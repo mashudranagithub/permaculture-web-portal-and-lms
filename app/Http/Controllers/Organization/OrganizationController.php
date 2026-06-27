@@ -10,6 +10,7 @@ use App\Notifications\OrganizationRejected;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -152,5 +153,58 @@ class OrganizationController extends Controller
 
         return redirect()->route('admin.organizations.index')
             ->with('message', "Organization '{$organization->name}' has been deleted.");
+    }
+
+    /**
+     * Show the edit form for an organization (Super Admin).
+     */
+    public function edit(Organization $organization): Response
+    {
+        if (!Auth::user()->hasRole('super-admin')) {
+            abort(403, 'This action is unauthorized.');
+        }
+
+        return Inertia::render('Organizations/Edit', [
+            'organization' => $organization,
+            'isSuperAdmin' => true,
+        ]);
+    }
+
+    /**
+     * Update the specified organization.
+     */
+    public function update(Request $request, Organization $organization): RedirectResponse
+    {
+        if (!$request->user()->hasRole('super-admin')) {
+            abort(403, 'This action is unauthorized.');
+        }
+
+        $request->validate([
+            'name'        => 'required|string|max:255',
+            'email'       => 'required|email|unique:organizations,email,' . $organization->id,
+            'phone'       => 'nullable|string|max:30',
+            'website'     => 'nullable|url|max:255',
+            'address'     => 'nullable|string|max:500',
+            'description' => 'nullable|string|max:2000',
+            'logo'        => 'nullable|image|mimes:jpg,jpeg,png,svg|max:2048',
+        ]);
+
+        $data = $request->only(['name', 'email', 'phone', 'website', 'address', 'description']);
+
+        if ($request->hasFile('logo')) {
+            if ($organization->logo) {
+                Storage::disk('public')->delete($organization->logo);
+            }
+            $data['logo'] = $request->file('logo')->store('organizations/logos', 'public');
+        }
+
+        if ($organization->name !== $request->name) {
+            $data['slug'] = \Illuminate\Support\Str::slug($request->name);
+        }
+
+        $organization->update($data);
+
+        return redirect()->route('admin.organizations.show', $organization->id)
+            ->with('message', 'Organization profile updated successfully.');
     }
 }
