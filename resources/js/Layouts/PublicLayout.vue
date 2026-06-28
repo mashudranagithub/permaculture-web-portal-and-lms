@@ -157,7 +157,7 @@ const getSettingVal = (val, fallback = '') => {
                 <div class="border-top border-success-subtle-10 mt-5 pt-4 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3" style="font-size: 0.85rem;">
                     <span class="text-white-50">&copy; 2026 {{ __('Regenerative Systems') }}. All rights reserved.</span>
                     <span class="text-white-50 d-flex align-items-center gap-1 flex-wrap">
-                        {{ __('Designed and Developed By') }} <a href="https://mashudrana.com" target="_blank" class="text-success text-decoration-none fw-bold hover-underline">Mashud Rana</a> <i class="bi bi-heart-fill text-danger animate-pulse"></i>
+                        {{ __('Designed and Developed By') }} <a href="https://mashudrana.com" target="_blank" class="text-success text-decoration-none fw-bold hover-underline">Mashud Rana</a>
                     </span>
                 </div>
 

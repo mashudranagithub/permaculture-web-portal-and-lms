@@ -2,8 +2,9 @@
 import PublicLayout from '@/Layouts/PublicLayout.vue';
 import StatsCounter from '@/Components/StatsCounter.vue';
 import EthicsSection from '@/Components/EthicsSection.vue';
-import { Head, Link, usePage } from '@inertiajs/vue3';
+import { Head, Link, usePage, useForm } from '@inertiajs/vue3';
 import { computed } from 'vue';
+import Swal from 'sweetalert2';
 
 const props = defineProps({
     canLogin: Boolean,
@@ -25,6 +26,39 @@ const page = usePage();
 const currentLocale = computed(() => {
     return (page.props.translations && page.props.translations['Home']) ? 'bn' : 'en';
 });
+
+const newsletterForm = useForm({
+    email: '',
+});
+
+const submitNewsletter = () => {
+    newsletterForm.post(route('newsletter.subscribe'), {
+        preserveScroll: true,
+        onSuccess: () => {
+            newsletterForm.reset('email');
+            Swal.fire({
+                icon: 'success',
+                title: page.props.flash?.message || 'Thank you for subscribing!',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true
+            });
+        },
+        onError: (errors) => {
+            Swal.fire({
+                icon: 'error',
+                title: errors.email || 'Subscription failed.',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 4000,
+                timerProgressBar: true
+            });
+        }
+    });
+};
 </script>
 
 <template>
@@ -55,8 +89,8 @@ const currentLocale = computed(() => {
                              minHeight: '90vh'
                          }">
                          
-                        <div class="container py-5 text-center position-relative z-1 animate-up">
-                            <div class="glass-hero-panel mx-auto max-w-4xl p-4 p-md-5 rounded-4 shadow-lg border border-white-10 backdrop-blur">
+                        <div class="container py-5 text-start position-relative z-1 animate-up">
+                            <div class="max-w-4xl">
                                 <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill bg-success-light-20 border border-success-light-40 mb-3">
                                     <span class="pulse-dot"></span>
                                     <span class="text-uppercase tracking-wider fw-bold small text-light">{{ __('Interactive Learning Common') }}</span>
@@ -64,10 +98,10 @@ const currentLocale = computed(() => {
                                 <h1 class="display-1 fw-extrabold mb-3 text-shadow lh-sm text-white">
                                     {{ slide.title[currentLocale] || slide.title['en'] }}
                                 </h1>
-                                <p class="lead max-w-3xl mx-auto fs-4 opacity-90 text-shadow mb-4 text-white">
+                                <p class="lead max-w-3xl fs-4 opacity-90 text-shadow mb-4 text-white">
                                     {{ slide.description[currentLocale] || slide.description['en'] }}
                                 </p>
-                                <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
+                                <div class="d-grid gap-3 d-sm-flex justify-content-sm-start">
                                     <Link :href="route('courses.browse')" class="btn btn-success btn-lg px-5 py-3 rounded-pill fw-bold shadow-sm transition-hover">
                                         {{ __('Explore Courses') }}
                                     </Link>
@@ -250,9 +284,12 @@ const currentLocale = computed(() => {
                     <p class="lead max-w-2xl mx-auto opacity-90 fs-5 mb-5 text-shadow">
                         {{ __('Subscribe to receive permaculture design insights, organic farm stories, and newly launched courses directory.') }}
                     </p>
-                    <form @submit.prevent="" class="d-flex flex-column flex-sm-row justify-content-center gap-2 max-w-lg mx-auto">
-                        <input type="email" class="form-control rounded-pill px-4 border-0 py-3 shadow" :placeholder="__('Enter your email address')" required />
-                        <button type="submit" class="btn btn-success btn-lg rounded-pill px-5 fw-bold shadow-sm transition-hover">{{ __('Subscribe') }}</button>
+                    <form @submit.prevent="submitNewsletter" class="d-flex flex-column flex-sm-row justify-content-center gap-2 max-w-lg mx-auto">
+                        <input v-model="newsletterForm.email" type="email" class="form-control rounded-pill px-4 border-0 py-3 shadow" :placeholder="__('Enter your email address')" required :disabled="newsletterForm.processing" />
+                        <button type="submit" class="btn btn-success btn-lg rounded-pill px-5 fw-bold shadow-sm transition-hover" :disabled="newsletterForm.processing">
+                            <span v-if="newsletterForm.processing" class="spinner-border spinner-border-sm me-1"></span>
+                            {{ __('Subscribe') }}
+                        </button>
                     </form>
                 </div>
             </div>
@@ -275,12 +312,7 @@ const currentLocale = computed(() => {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
-.glass-hero-panel {
-    background: rgba(10, 30, 20, 0.38);
-    backdrop-filter: blur(16px) saturate(180%);
-    -webkit-backdrop-filter: blur(16px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.125);
-}
+
 .bg-glass-morphism {
     background: rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(12px);
@@ -347,5 +379,20 @@ const currentLocale = computed(() => {
     line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
+}
+#heroCarousel .carousel-indicators [data-bs-target] {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: none;
+    background-color: rgba(255, 255, 255, 0.45);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin: 0 6px;
+    opacity: 1;
+}
+#heroCarousel .carousel-indicators .active {
+    width: 24px;
+    border-radius: 5px;
+    background-color: #39da8a;
 }
 </style>

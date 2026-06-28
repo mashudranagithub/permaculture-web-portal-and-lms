@@ -65,6 +65,7 @@ Route::get('partners/{slug}', [PublicPageController::class, 'partnerDetails'])->
 Route::get('terms', [PublicPageController::class, 'terms'])->name('terms');
 Route::get('privacy', [PublicPageController::class, 'privacy'])->name('privacy');
 Route::get('contact', [PublicPageController::class, 'contact'])->name('contact');
+Route::post('newsletter/subscribe', [\App\Http\Controllers\NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
 
 Route::middleware(['auth', 'approved'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
