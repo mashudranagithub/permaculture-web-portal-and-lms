@@ -203,7 +203,7 @@ Route::middleware(['auth', 'verified', 'approved'])->group(function () {
 // Public Certificate Verification
 Route::get('verify/{token}', [\App\Http\Controllers\CertificateController::class, 'verify'])->name('certificates.verify');
 
-Route::get('lang/{locale}', function ($locale) {
+Route::get('locale/{locale}', function ($locale) {
     if (in_array($locale, ['en', 'bn'])) {
         session()->put('locale', $locale);
     }
