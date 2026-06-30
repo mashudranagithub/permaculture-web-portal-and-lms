@@ -173,6 +173,12 @@ watch(() => page.props.flash, (flash) => {
                                 <p>{{ __('Manage Students') }}</p>
                             </Link>
                         </li>
+                        <li v-if="$page.props.auth.user.roles.includes('super-admin') || $page.props.auth.user.roles.includes('admin')" class="nav-item">
+                            <Link :href="route('admin.teachers.index')" class="nav-link" :class="{ 'active': route().current('admin.teachers.*') }">
+                                <i class="nav-icon bi bi-person-badge-fill"></i>
+                                <p>{{ __('Manage Teachers') }}</p>
+                            </Link>
+                        </li>
                         <li v-if="!$page.props.auth.user.roles.includes('student')" class="nav-item">
                             <Link :href="route('admin.certificates.index')" class="nav-link" :class="{ 'active': route().current('admin.certificates.*') }">
                                 <i class="nav-icon bi bi-patch-check-fill"></i>
